@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>xyz.chen</groupId>
-    <artifactId>parent</artifactId>
-    <version>0.0.1</version>
-
     <packaging>pom</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -15,13 +9,25 @@
         <version>3.2.1</version>
         <relativePath/>
     </parent>
+    <groupId>xyz.chen</groupId>
+    <artifactId>root</artifactId>
+    <version>0.0.1</version>
+    <name>root</name>
+    <modules>
+        <module>commons</module>
+        <module>member</module>
+    </modules>
+
+
     <properties>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <postgresql.version>42.7.1</postgresql.version>
         <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <hutool.version>5.8.24</hutool.version>
         <jib.version>3.4.0</jib.version>
         <servlet-api.version>6.0.0</servlet-api.version>
+        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
         <java.version>21</java.version>
     </properties>
     <dependencyManagement>
@@ -46,6 +52,11 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
@@ -55,6 +66,11 @@
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -92,5 +108,4 @@
             </repositories>
         </profile>
     </profiles>
-
 </project>

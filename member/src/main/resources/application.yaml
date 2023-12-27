@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: "jdbc:postgresql://101.133.231.235:15432/study?\
+          ssl=true&\
+          sslmode=verify-ca&\
+          sslrootcert=D:/Workspace/config/postgresql/root-ca.crt&\
+          sslkey=D:/Workspace/config/postgresql/client.key.pk8&\
+          sslcert=D:/Workspace/config/postgresql/client.crt"
+    username: chen
+  data:
+    redis:
+      host: localhost
+      port: 6379
+defaultPrefix: cache
+defaultExpire: 14400s
