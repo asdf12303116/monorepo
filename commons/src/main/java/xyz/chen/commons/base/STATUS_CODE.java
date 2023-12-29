@@ -19,7 +19,8 @@ public enum STATUS_CODE {
     LOGIN_EXPIRED(401500, "登陆过期"),
     ACCESS_DENIED_REQUIRE(40310, "需要登陆"),
     ACCESS_DENIED_ERROR(40300, "权限不足"),
-    NOT_FOUND(40400, "资源不存在");
+    NOT_FOUND(40400, "资源不存在"),
+    UNKNOWN_ERROR(50000, "未知错误");
     private final Integer code;
     private final String codeMessage;
 

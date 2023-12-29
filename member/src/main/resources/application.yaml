@@ -11,5 +11,16 @@ spring:
     redis:
       host: localhost
       port: 6379
+  web:
+    resources:
+      add-mappings: false
 defaultPrefix: cache
 defaultExpire: 14400s
+
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true

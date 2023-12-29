@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,7 @@ import xyz.chen.commons.base.UserInfo;
 import xyz.chen.commons.utils.JwtUtils;
 import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.services.AuthService;
+import xyz.chen.member.utils.AuthExceptionUtils;
 
 import java.io.IOException;
 
@@ -36,9 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtToken = authorizationHeader.substring(7);
             try {
                 userInfo = JwtUtils.getUserInfo(jwtToken);
-            } catch (Exception e) {
-                // Handle token extraction/validation errors
-                System.out.println("Error extracting username from token: " + e.getMessage());
+            } catch (RuntimeException e) {
+                AuthExceptionUtils.genExceptionResp(response, e);
+                return;
             }
         }
 
