@@ -48,10 +48,8 @@ public class SecurityConfig {
                 .requestMatchers("/3").authenticated()
                 .anyRequest().permitAll()
         );
-        http.exceptionHandling(exception -> {
-            exception.accessDeniedHandler(accessDeniedHandler())
-                    .authenticationEntryPoint(authenticationEntryPoint());
-        });
+        http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint()));
         http.addFilterAt(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

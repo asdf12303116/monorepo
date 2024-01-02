@@ -36,12 +36,12 @@ public class LoginController {
             );
         } catch (AuthenticationException e) {
             return switch (e) {
-                case BadCredentialsException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
-                case DisabledException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
-                case LockedException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_LOCKED);
-                case AccountExpiredException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
-                case CredentialsExpiredException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
-                case UsernameNotFoundException exception -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+                case BadCredentialsException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+                case DisabledException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
+                case LockedException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_LOCKED);
+                case AccountExpiredException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
+                case CredentialsExpiredException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_EXPIRED);
+                case UsernameNotFoundException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
                 default -> BaseResponse.fail(STATUS_CODE.LOGIN_UNKNOWN_ERROR);
             };
         }

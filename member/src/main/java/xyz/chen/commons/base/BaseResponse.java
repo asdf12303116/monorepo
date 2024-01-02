@@ -43,27 +43,27 @@ public class BaseResponse<T> {
     }
 
     public static <T> BaseResponse<T> ok(T body, PageInfo page) {
-        return new BaseResponse<T>(true, STATUS_CODE.OK, "操作成功", body, page);
+        return new BaseResponse<>(true, STATUS_CODE.OK, "操作成功", body, page);
     }
 
     public static <T> BaseResponse<T> ok(T body) {
-        return new BaseResponse<T>(true, STATUS_CODE.OK, "操作成功", body);
+        return new BaseResponse<>(true, STATUS_CODE.OK, "操作成功", body);
     }
 
     public static <T> BaseResponse<T> ok(String message,T body) {
-        return new BaseResponse<T>(true, STATUS_CODE.OK, message, body);
+        return new BaseResponse<>(true, STATUS_CODE.OK, message, body);
     }
 
     public static <T> BaseResponse<T> fail(STATUS_CODE statusCode, String message,T body) {
-        return new BaseResponse<T>(false, statusCode, message, body);
+        return new BaseResponse<>(false, statusCode, message, body);
     }
 
     public static <T> BaseResponse<T> fail(STATUS_CODE statusCode, String message) {
-        return new BaseResponse<T>(false, statusCode, message, null);
+        return new BaseResponse<>(false, statusCode, message, null);
     }
 
     public static <T> BaseResponse<T> fail(STATUS_CODE statusCode) {
-        return new BaseResponse<T>(false, statusCode);
+        return new BaseResponse<>(false, statusCode);
     }
 
 }
