@@ -14,7 +14,6 @@
     <version>0.0.1</version>
     <name>root</name>
     <modules>
-        <module>commons</module>
         <module>member</module>
     </modules>
 
