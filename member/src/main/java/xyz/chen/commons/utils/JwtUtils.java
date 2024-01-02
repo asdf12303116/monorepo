@@ -1,7 +1,6 @@
 package xyz.chen.commons.utils;
 
 import cn.hutool.core.lang.UUID;
-import cn.hutool.core.util.StrUtil;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -12,7 +11,6 @@ import xyz.chen.commons.base.UserInfo;
 
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.List;
 
 public class JwtUtils {
     private static final String sharedSecret = "31611159e7e6ff7843ea4627745e89225fc866621cfcfdbd40871af4413747cc";
