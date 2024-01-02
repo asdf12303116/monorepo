@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +26,7 @@ import xyz.chen.member.utils.AuthExceptionUtils;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private AuthService authService;
@@ -40,6 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 userInfo = JwtUtils.getUserInfo(jwtToken);
             } catch (RuntimeException e) {
+                log.warn("触发异常: {},异常描述: {}",e.getClass().getName(),e.getMessage());
+                log.error("异常详情",e);
                 AuthExceptionUtils.genExceptionResp(response, e);
                 return;
             }

@@ -21,45 +21,19 @@ public class AuthExceptionUtils {
     public static void genExceptionResp(HttpServletResponse response, RuntimeException exception) {
         BaseResponse<Object> respObj;
         respObj = switch (exception) {
-            case InsufficientAuthenticationException insufficientAuthenticationException -> {
-                yield BaseResponse.fail(STATUS_CODE.ACCESS_DENIED_REQUIRE);
-            }
-            case AccessDeniedException accessDeniedException -> {
-                yield BaseResponse.fail(STATUS_CODE.ACCESS_DENIED_ERROR);
-            }
-            case SessionAuthenticationException sessionAuthenticationException -> {
-                log.debug("异常信息: {}", sessionAuthenticationException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_EXPIRED);
-            }
-            case BadCredentialsException badCredentialsException -> {
-                log.debug("异常信息: {}", badCredentialsException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
-            }
-            case AccountExpiredException accountExpiredException -> {
-                log.debug("异常信息: {}", accountExpiredException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
-            }
-            case DisabledException disabledException -> {
-                log.debug("异常信息: {}", disabledException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
-            }
-            case LockedException lockedException -> {
-                log.debug("异常信息: {}", lockedException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
-            }
-            case AccountStatusException accountStatusException -> {
-                log.debug("异常信息: {}", accountStatusException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
-            }
-            case UsernameNotFoundException usernameNotFoundException -> {
-                log.debug("异常信息: {}", usernameNotFoundException.getMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
-            }
-            default -> {
-                log.debug("异常信息: {}", exception.getLocalizedMessage());
-                yield BaseResponse.fail(STATUS_CODE.LOGIN_UNKNOWN_ERROR, exception.getLocalizedMessage());
-            }
+            case InsufficientAuthenticationException ignored -> BaseResponse.fail(STATUS_CODE.ACCESS_DENIED_REQUIRE);
+            case AccessDeniedException ignored -> BaseResponse.fail(STATUS_CODE.ACCESS_DENIED_ERROR);
+            case SessionAuthenticationException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_EXPIRED);
+            case BadCredentialsException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+            case AccountExpiredException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
+            case DisabledException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
+            case LockedException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
+            case AccountStatusException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_STATUS);
+            case UsernameNotFoundException ignored -> BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+            default -> BaseResponse.fail(STATUS_CODE.LOGIN_UNKNOWN_ERROR, exception.getLocalizedMessage());
         };
+        log.warn("触发异常: {},异常描述: {}",exception.getClass().getName(),exception.getMessage());
+        log.error("异常详情",exception);
         applyResp(response,respObj);
     }
 

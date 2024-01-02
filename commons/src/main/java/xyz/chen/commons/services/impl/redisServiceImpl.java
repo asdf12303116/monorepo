@@ -12,9 +12,9 @@ import java.time.Duration;
 @Service
 public class redisServiceImpl implements redisCacheService {
     private final RedisTemplate<String, Object> redisTemplate;
-    @Value("${defaultPrefix:cache}")
+    @Value("${default-prefix:cache}")
     private String DEFAULT_PREFIX;
-    @Value("${defaultExpire:7200s}")
+    @Value("${default-expire:7200s}")
     private Duration DEFAULT_EXPIRE;
 
     public redisServiceImpl(RedisTemplate<String, Object> redisTemplate) {

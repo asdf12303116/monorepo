@@ -10,6 +10,8 @@ public class ExceptionController {
 
     @ExceptionHandler(Exception.class)
     public BaseResponse<String> exceptionHandler(Exception e) {
+        log.warn("触发异常: {},异常描述: {}",e.getClass().getName(),e.getMessage());
+        log.error("异常详情",e);
         return BaseResponse.fail(STATUS_CODE.UNKNOWN_ERROR, e.getLocalizedMessage());
     }
 

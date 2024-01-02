@@ -14,8 +14,9 @@ spring:
   web:
     resources:
       add-mappings: false
-defaultPrefix: cache
-defaultExpire: 14400s
+default-prefix: cache
+default-expire: 14400s
+default-time-zone: Asia/Shanghai
 
 
 server:

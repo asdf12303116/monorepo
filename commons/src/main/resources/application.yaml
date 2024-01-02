@@ -3,5 +3,5 @@ spring:
     redis:
       host: localhost
       port: 6379
-defaultPrefix: commons
-defaultExpire: 7200s
+default-prefix: commons
+default-expire: 7200s
