@@ -18,7 +18,6 @@ import xyz.chen.commons.base.UserInfo;
 import xyz.chen.commons.utils.JwtUtils;
 import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.services.AuthService;
-import xyz.chen.member.utils.AuthExceptionUtils;
 
 import java.io.IOException;
 
@@ -27,6 +26,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private AuthService authService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
@@ -36,14 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwtToken = authorizationHeader.substring(7);
-            try {
                 userInfo = JwtUtils.getUserInfo(jwtToken);
-            } catch (RuntimeException e) {
-                log.warn("触发异常: {},异常描述: {}",e.getClass().getName(),e.getMessage());
-                log.error("异常详情",e);
-                AuthExceptionUtils.genExceptionResp(response, e);
-                return;
-            }
         }
 
         if (userInfo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -72,5 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+
+
     }
 }

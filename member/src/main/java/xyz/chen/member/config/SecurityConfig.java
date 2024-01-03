@@ -15,9 +15,11 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import xyz.chen.commons.base.FilterExceptionHandler;
 import xyz.chen.member.filter.JwtAuthenticationFilter;
 import xyz.chen.member.services.AuthService;
-import xyz.chen.member.utils.AuthExceptionUtils;
+import xyz.chen.member.utils.exceptionUtils;
 
 @Configuration
 public class SecurityConfig {
@@ -38,6 +40,10 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter();
     }
 
+    @Bean
+    public FilterExceptionHandler filterExceptionHandler() {
+        return new FilterExceptionHandler();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -51,6 +57,7 @@ public class SecurityConfig {
         http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler())
                 .authenticationEntryPoint(authenticationEntryPoint()));
         http.addFilterAt(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(filterExceptionHandler(), SecurityContextHolderFilter.class);
 
         return http.build();
     }
@@ -65,12 +72,12 @@ public class SecurityConfig {
 
     @Bean
     AuthenticationEntryPoint authenticationEntryPoint() {
-        return ((request, response, authException) -> AuthExceptionUtils.genExceptionResp(response, authException));
+        return ((request, response, authException) -> exceptionUtils.genExceptionResp(response, authException));
     }
 
 
     @Bean
     AccessDeniedHandler accessDeniedHandler() {
-        return ((request, response, exception) -> AuthExceptionUtils.genExceptionResp(response, exception));
+        return ((request, response, exception) -> exceptionUtils.genExceptionResp(response, exception));
     }
 }
