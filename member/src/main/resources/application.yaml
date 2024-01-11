@@ -14,10 +14,24 @@ spring:
   web:
     resources:
       add-mappings: false
+  security:
+    oauth2:
+      client:
+        provider:
+          azure:
+            issuer-uri: https://login.microsoftonline.com/59b48c05-1e21-49cb-9650-60199b178ae8/v2.0
+
+        registration:
+          azure-dev:
+            provider: azure
+            client-id: 72c3ed3d-ba03-42ab-81e4-4ff7fba718ce
+            client-secret: YoU8Q~A.KRZ1xD1pohKKyNsBqOulIM2OT.1t9cZ7
+            redirect-uri: http://localhost:8080/login/oauth2Callback
+            scope:
+              - User.Read
 default-prefix: cache
 default-expire: 14400s
 default-time-zone: Asia/Shanghai
-
 
 server:
   servlet:

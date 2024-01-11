@@ -28,6 +28,7 @@
         <servlet-api.version>6.0.0</servlet-api.version>
         <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
         <java.version>21</java.version>
+        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -73,6 +74,26 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <ruleSet>
+                        <ignoreVersions>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>.*[-_\.](alpha|Alpha|ALPHA|b|beta|Beta|BETA|rc|RC|M|EA)[-_\.]?[0-9]*</version>
+                            </ignoreVersion>
+                        </ignoreVersions>
+                    </ruleSet>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

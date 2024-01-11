@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -54,6 +55,7 @@ public class SecurityConfig {
                 .requestMatchers("/3").authenticated()
                 .anyRequest().permitAll()
         );
+        http.oauth2Login(Customizer.withDefaults());
         http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler())
                 .authenticationEntryPoint(authenticationEntryPoint()));
         http.addFilterAt(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

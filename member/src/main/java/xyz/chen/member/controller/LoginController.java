@@ -1,12 +1,21 @@
 package xyz.chen.member.controller;
 
 
+import cn.hutool.core.collection.CollUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import xyz.chen.commons.base.BaseResponse;
 import xyz.chen.commons.base.STATUS_CODE;
 import xyz.chen.commons.utils.JwtUtils;
@@ -14,10 +23,19 @@ import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.entity.LoginData;
 import xyz.chen.member.services.AuthService;
 
+import java.util.Map;
 
+
+@Slf4j
 @RestController
 public class LoginController {
 
+
+    @Autowired
+    ClientRegistrationRepository clientRegistrationRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
 
@@ -51,4 +69,45 @@ public class LoginController {
         return BaseResponse.ok("登录成功", token);
     }
 
+    @GetMapping("/login/oauth2Callback1")
+    public BaseResponse<String> oauth(@RequestParam String code) {
+        return BaseResponse.ok("code成功", code);
+    }
+
+    @GetMapping("/login/oauth2Callback")
+    public BaseResponse<Object> getCode(@RequestParam String code, @RequestParam String state) {
+        ClientRegistration registration = clientRegistrationRepository.findByRegistrationId("azure-dev");
+        String codeUrl = registration.getProviderDetails().getTokenUri();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
+        postParameters.add("grant_type", "authorization_code");
+        postParameters.add("client_id", registration.getClientId());
+        postParameters.add("client_secret", registration.getClientSecret());
+        postParameters.add("scope", CollUtil.join(registration.getScopes(), ","));
+        postParameters.add("redirect_uri", registration.getRedirectUri());
+        postParameters.add("code", code);
+        postParameters.add("state", state);
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(postParameters, headers);
+
+        try {
+            Map data = restTemplate.postForEntity(codeUrl, request, Map.class).getBody();
+
+            return BaseResponse.ok("code成功", data);
+        } catch (RuntimeException e) {
+            if (e instanceof RestClientException) {
+                log.error("请求OAUTH2 token异常", e);
+            }
+            return BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+        }
+
+
+    }
+
+
+    @GetMapping("/3")
+    public BaseResponse<String> test() {
+        return BaseResponse.ok("test成功");
+    }
 }
