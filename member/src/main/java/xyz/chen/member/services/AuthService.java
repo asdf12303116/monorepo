@@ -24,6 +24,14 @@ public class AuthService implements UserDetailsService {
         return authUser;
     }
 
+    public UserDetails loadUserByOAuthUUID(String uuid) throws UsernameNotFoundException {
+        AuthUser authUser = authUserRepository.getAuthUserByUUIDWithRoles(uuid);
+        if (authUser == null) {
+            throw new UsernameNotFoundException("用户不存在");
+        }
+        return authUser;
+    }
+
 
 
 

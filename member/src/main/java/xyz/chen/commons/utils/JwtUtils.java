@@ -7,10 +7,12 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.SneakyThrows;
+import xyz.chen.commons.base.OAuthUserInfo;
 import xyz.chen.commons.base.UserInfo;
 
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.List;
 
 public class JwtUtils {
     private static final String sharedSecret = "31611159e7e6ff7843ea4627745e89225fc866621cfcfdbd40871af4413747cc";
@@ -54,19 +56,48 @@ public class JwtUtils {
         JWSObject jwsObject = JWSObject.parse(token);
        return jwsObject.verify(getHmacJwsVerifier());
     }
+
+    @SneakyThrows
+    private static JWTClaimsSet getJWTClaimsSet(String token, Boolean needCheck) {
+        if (!needCheck) {
+            return getJWTClaimsSetWithOutCheck(token);
+        }
+        Boolean isVerify = verifySignedJwt(token);
+        if (isVerify) {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            return claimsSet;
+        } else {
+            throw new RuntimeException("token解析失败");
+        }
+    }
+
+    @SneakyThrows
+    private static JWTClaimsSet getJWTClaimsSetWithOutCheck(String token) {
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+        return claimsSet;
+    }
+
+
     @SneakyThrows
     public static UserInfo getUserInfo(String token) {
-         Boolean isVerify = verifySignedJwt(token);
-         if (isVerify) {
-             SignedJWT signedJWT = SignedJWT.parse(token);
-             JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-             Long userId = Long.parseLong(claimsSet.getSubject());
-             String userName = (String) claimsSet.getClaim("userName");
-             String roles = (String) claimsSet.getClaim("roles");
-             return new UserInfo(userId, userName, roles);
-         } else {
-             throw new RuntimeException("token验证失败");
-         }
+        JWTClaimsSet claimsSet = getJWTClaimsSet(token, true);
+        Long userId = Long.parseLong(claimsSet.getSubject());
+        String userName = (String) claimsSet.getClaim("userName");
+        String roles = (String) claimsSet.getClaim("roles");
+        return new UserInfo(userId, userName, roles);
+    }
+
+    @SneakyThrows
+    public static OAuthUserInfo getOAuthUserInfo(String token) {
+        JWTClaimsSet claimsSet = getJWTClaimsSet(token, false);
+        String userUUID = (String) claimsSet.getClaim("oid");
+        String email = (String) claimsSet.getClaim("email");
+        String userName = (String) claimsSet.getClaim("preferred_username");
+        String showName = (String) claimsSet.getClaim("name");
+        List<String> groups = (List<String>) claimsSet.getClaim("groups");
+        return new OAuthUserInfo(userName, showName, userUUID, email, groups);
     }
 
 

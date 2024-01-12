@@ -32,6 +32,8 @@ public class AuthUser extends BaseEntity implements UserDetails {
 
     private String roles;
 
+    private String oauth_uuid;
+
     private boolean enabled = true;
 
     private boolean accountNonExpired = true;

@@ -18,5 +18,14 @@ public interface AuthUserRepository extends BaseMapper<AuthUser> {
             """)
     AuthUser getAuthUserWithRoles(String username);
 
+    @Select("""
+            SELECT t_user.*, string_agg(t_user_role.role_code, ',') AS roles
+            FROM t_user
+                     JOIN t_user_role ON t_user.id = t_user_role.user_id
+            where t_user.oauth_uuid = #{uuid}
+            GROUP BY t_user.id
+            """)
+    AuthUser getAuthUserByUUIDWithRoles(String uuid);
+
 
 }

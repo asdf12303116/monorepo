@@ -18,7 +18,7 @@ public class ExceptionController {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public BaseResponse<String> noHandlerException(Exception e) {
-        log.warn("触发异常: {},异常描述: {}", e.getClass().getName(), e.getMessage());
+//        log.warn("触发异常: {},异常描述: {}", e.getClass().getName(), e.getMessage());
         return BaseResponse.fail(STATUS_CODE.UNKNOWN_ERROR, e.getLocalizedMessage());
     }
 

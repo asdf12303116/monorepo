@@ -10,6 +10,7 @@ public enum STATUS_CODE {
     REQUEST_TYPE_ERROR(40500, "请求类型错误,不允许的类型:"),
 
     LOGIN_UNKNOWN_ERROR(400000, "登录时遇到问题，请稍后重试"),
+    LOGIN_FAIL_TOKEN(400001, "获取token时遇到问题，请稍后重试"),
     LOGIN_FAIL_AUTH(40100, "用户名或密码错误"),
     LOGIN_FAIL_CAPTCHA(401100, "验证码错误"),
     LOGIN_FAIL_DISABLE(401200, "用户已禁用，请联系管理员"),

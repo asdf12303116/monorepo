@@ -34,7 +34,7 @@ public class GlobalFill implements MetaObjectHandler {
 
     private userInfo getUserInfo(){
         userInfo userInfo;
-        userInfo = new userInfo(1L, "");
+        userInfo = new userInfo(configData.getDefaultSystemId(), configData.getDefaultSystemName());
         return  userInfo;
     }
 

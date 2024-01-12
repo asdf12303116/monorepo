@@ -13,4 +13,7 @@ public class UserRole extends BaseEntity {
     private Long userId;
     //@Comment("角色ID")
     private Long roleId;
+
+    private String roleCode;
+    private String roleName;
 }

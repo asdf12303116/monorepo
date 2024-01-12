@@ -14,14 +14,16 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import xyz.chen.commons.base.BaseResponse;
+import xyz.chen.commons.base.OAuthUserInfo;
 import xyz.chen.commons.base.STATUS_CODE;
 import xyz.chen.commons.utils.JwtUtils;
 import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.entity.LoginData;
 import xyz.chen.member.services.AuthService;
+import xyz.chen.member.services.OAuthService;
+import xyz.chen.member.services.UserService;
 
 import java.util.Map;
 
@@ -36,6 +38,12 @@ public class LoginController {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    OAuthService oAuthService;
+
+    @Autowired
+    UserService userService;
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
 
@@ -93,13 +101,19 @@ public class LoginController {
 
         try {
             Map data = restTemplate.postForEntity(codeUrl, request, Map.class).getBody();
+            String token = (String) data.get("access_token");
+            OAuthUserInfo userInfo = JwtUtils.getOAuthUserInfo(token);
+            Boolean isExistsUser = userService.existsUserByOAuthUUID(userInfo.uuid());
 
-            return BaseResponse.ok("code成功", data);
-        } catch (RuntimeException e) {
-            if (e instanceof RestClientException) {
-                log.error("请求OAUTH2 token异常", e);
+            if (!isExistsUser) {
+                userService.createOAuthUser(userInfo);
             }
-            return BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_AUTH);
+            AuthUser authUser = (AuthUser) authService.loadUserByOAuthUUID(userInfo.uuid());
+            String loginToken = JwtUtils.generateSignedJwt(authUser.getUsername(), authUser.getId(), authUser.getRoles());
+            return BaseResponse.ok("登录成功", loginToken);
+        } catch (RuntimeException e) {
+            log.error("获取token出错", e);
+            return BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_TOKEN);
         }
 
 
