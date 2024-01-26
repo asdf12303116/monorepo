@@ -23,7 +23,7 @@
         <postgresql.version>42.7.1</postgresql.version>
         <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <hutool.version>5.8.24</hutool.version>
+        <hutool.version>5.8.25</hutool.version>
         <jib.version>3.4.0</jib.version>
         <servlet-api.version>6.0.0</servlet-api.version>
         <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
