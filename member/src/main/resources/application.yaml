@@ -32,11 +32,10 @@ spring:
 default-prefix: cache
 default-expire: 14400s
 default-time-zone: Asia/Shanghai
-#by zhengkai.blog.csdn.net
-#mybatis-plus配置控制台打印完整带参数SQL语句
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    xyz.xyz.chen.member.repository: debug
 
 server:
   servlet:
