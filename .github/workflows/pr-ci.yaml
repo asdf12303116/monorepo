@@ -1,10 +1,10 @@
-name: Create Release
+name: pull request check
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
+  pull_request:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,10 +23,6 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
-      - id: get-version
-        uses: jactions/maven-version@v1.2.0
-        with:
-          pom: ./member/pom.xml
 
       - id: commit
         uses: prompt/actions-commit-hash@v3
@@ -38,21 +34,4 @@ jobs:
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./member/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
-
-      - name: Create changelog text
-        id: changelog
-        uses: loopwerk/tag-changelog@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          config_file: .github/tag-changelog-config.js
-
-      - name: Check CHANGELOG
-        run: echo "${{ steps.changelog.outputs.changes }}" >> change.md
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: change.md
-          prerelease: true
-          files: ./*.jar
+        run: mv ./member/target/*.jar ./app.${{ github.head_ref }}.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
