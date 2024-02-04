@@ -22,8 +22,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          restore-keys: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
       - id: get-version
         uses: jactions/maven-version@v1.2.0
         with:
