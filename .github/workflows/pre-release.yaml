@@ -1,4 +1,4 @@
-name: Create Release
+name: create pre-release
 
 on:
   workflow_dispatch:
@@ -16,7 +16,13 @@ jobs:
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
-          cache: 'maven'
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
       - id: get-version
         uses: jactions/maven-version@v1.2.0
         with:
@@ -32,7 +38,7 @@ jobs:
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./member/target/*.jar ./app.${{ env.ver }}.jar
+        run: mv ./member/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
 
       - name: Create changelog text
         id: changelog
