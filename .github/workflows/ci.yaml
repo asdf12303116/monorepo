@@ -32,7 +32,7 @@ jobs:
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./member/target/*.jar ./app.${{ env.ver }}.jar
+        run: mv ./member/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
 
       - name: Create changelog text
         id: changelog
