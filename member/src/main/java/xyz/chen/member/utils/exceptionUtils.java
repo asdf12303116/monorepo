@@ -33,14 +33,14 @@ public class exceptionUtils {
             default -> BaseResponse.fail(STATUS_CODE.LOGIN_UNKNOWN_ERROR, exception.getLocalizedMessage());
         };
         log.warn("触发异常: {},异常描述: {}",exception.getClass().getName(),exception.getMessage());
-        log.error("异常详情",exception);
+//        log.error("异常详情",exception);
         applyResp(response,respObj);
     }
 
     public static void genExceptionResp(HttpServletResponse response, Exception exception) {
         BaseResponse<Object> respObj = BaseResponse.fail(STATUS_CODE.LOGIN_UNKNOWN_ERROR, exception.getLocalizedMessage());
         log.warn("触发异常: {},异常描述: {}", exception.getClass().getName(), exception.getMessage());
-        log.error("异常详情", exception);
+//        log.error("异常详情", exception);
         applyResp(response, respObj);
     }
 
