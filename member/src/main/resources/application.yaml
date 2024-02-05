@@ -35,8 +35,14 @@ default-time-zone: Asia/Shanghai
 
 logging:
   level:
-    xyz.xyz.chen.member.repository: debug
+    xyz.chen.member.repository: debug
 
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: true
+      logic-not-delete-value: false
 server:
   servlet:
     encoding:

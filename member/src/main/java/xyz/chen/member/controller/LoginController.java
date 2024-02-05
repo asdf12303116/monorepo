@@ -120,8 +120,4 @@ public class LoginController {
     }
 
 
-    @GetMapping("/3")
-    public BaseResponse<String> test() {
-        return BaseResponse.ok("test成功");
-    }
 }

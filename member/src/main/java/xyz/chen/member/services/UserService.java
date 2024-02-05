@@ -34,5 +34,9 @@ public class UserService extends ServiceImpl<UserRepository, User> {
         roleService.grantUserRoles(oAuthUserInfo.groups(), userId);
     }
 
+    public Boolean deleteUserById(Long userId) {
+        return removeById(userId);
+    }
+
 
 }
