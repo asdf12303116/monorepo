@@ -108,3 +108,93 @@ comment on column public.t_user_role.user_id is '用户ID';
 comment on column public.t_user_role.role_code is '角色代码';
 comment on column public.t_user_role.role_name is '角色名称';
 
+CREATE TABLE public.t_book_info
+(
+    id               bigint PRIMARY KEY NOT NULL,             -- 主键ID
+    create_time      timestamp(6) WITHOUT TIME ZONE,          -- 创建时间
+    create_user_id   bigint,                                  -- 创建用户ID
+    deleted          boolean,                                 -- 是否逻辑删除
+    update_time      timestamp(6) WITHOUT TIME ZONE,          -- 修改时间
+    update_user_id   bigint,                                  -- 修改用户ID
+    create_user_name character varying(60),                   -- 创建用户名
+    update_user_name character varying(60),                   -- 更新用户名
+    book_name        character varying(255),                  -- 图书名称
+    author           character varying(255),                  -- 作者
+    publication_date date,                                    -- 出版日期
+    ISBN             character varying(255),                  -- ISBN编号
+    description      text                                     -- 图书描述
+);
+
+COMMENT ON COLUMN public.t_book_info.id IS '主键ID';
+COMMENT ON COLUMN public.t_book_info.create_time IS '创建时间';
+COMMENT ON COLUMN public.t_book_info.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN public.t_book_info.deleted IS '是否逻辑删除';
+COMMENT ON COLUMN public.t_book_info.update_time IS '修改时间';
+COMMENT ON COLUMN public.t_book_info.update_user_id IS '修改用户ID';
+COMMENT ON COLUMN public.t_book_info.create_user_name IS '创建用户名';
+COMMENT ON COLUMN public.t_book_info.update_user_name IS '更新用户名';
+COMMENT ON COLUMN public.t_book_info.book_name IS '图书名称';
+COMMENT ON COLUMN public.t_book_info.author IS '作者';
+COMMENT ON COLUMN public.t_book_info.publication_date IS '出版日期';
+COMMENT ON COLUMN public.t_book_info.ISBN IS 'ISBN编号';
+COMMENT ON COLUMN public.t_book_info.description IS '图书描述';
+
+CREATE TABLE public.t_book_borrow
+(
+    id               bigint PRIMARY KEY NOT NULL,             -- 主键ID
+    create_time      timestamp(6) WITHOUT TIME ZONE,          -- 创建时间
+    create_user_id   bigint,                                  -- 创建用户ID
+    deleted          boolean,                                 -- 是否逻辑删除
+    update_time      timestamp(6) WITHOUT TIME ZONE,          -- 修改时间
+    update_user_id   bigint,                                  -- 修改用户ID
+    create_user_name character varying(60),                   -- 创建用户名
+    update_user_name character varying(60),                   -- 更新用户名
+    user_id          bigint,                                  -- 用户ID
+    book_id          bigint,                                  -- 图书ID
+    borrow_date      date,                                    -- 借阅日期
+    return_date      date,                                    -- 预计归还日期
+    status           character varying(255)                   -- 状态
+);
+
+COMMENT ON COLUMN public.t_book_borrow.id IS '主键ID';
+COMMENT ON COLUMN public.t_book_borrow.create_time IS '创建时间';
+COMMENT ON COLUMN public.t_book_borrow.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN public.t_book_borrow.deleted IS '是否逻辑删除';
+COMMENT ON COLUMN public.t_book_borrow.update_time IS '修改时间';
+COMMENT ON COLUMN public.t_book_borrow.update_user_id IS '修改用户ID';
+COMMENT ON COLUMN public.t_book_borrow.create_user_name IS '创建用户名';
+COMMENT ON COLUMN public.t_book_borrow.update_user_name IS '更新用户名';
+COMMENT ON COLUMN public.t_book_borrow.user_id IS '用户ID';
+COMMENT ON COLUMN public.t_book_borrow.book_id IS '图书ID';
+COMMENT ON COLUMN public.t_book_borrow.borrow_date IS '借阅日期';
+COMMENT ON COLUMN public.t_book_borrow.return_date IS '预计归还日期';
+COMMENT ON COLUMN public.t_book_borrow.status IS '状态';
+
+CREATE TABLE public.t_book_return
+(
+    id               bigint PRIMARY KEY NOT NULL,             -- 主键ID
+    create_time      timestamp(6) WITHOUT TIME ZONE,          -- 创建时间
+    create_user_id   bigint,                                  -- 创建用户ID
+    deleted          boolean,                                 -- 是否逻辑删除
+    update_time      timestamp(6) WITHOUT TIME ZONE,          -- 修改时间
+    update_user_id   bigint,                                  -- 修改用户ID
+    create_user_name character varying(60),                   -- 创建用户名
+    update_user_name character varying(60),                   -- 更新用户名
+    user_id          bigint,                                  -- 用户ID
+    book_id          bigint,                                  -- 图书ID
+    borrow_id        bigint,                                  -- 借阅ID
+    return_date      date                                     -- 归还日期
+);
+
+COMMENT ON COLUMN public.t_book_return.id IS '主键ID';
+COMMENT ON COLUMN public.t_book_return.create_time IS '创建时间';
+COMMENT ON COLUMN public.t_book_return.create_user_id IS '创建用户ID';
+COMMENT ON COLUMN public.t_book_return.deleted IS '是否逻辑删除';
+COMMENT ON COLUMN public.t_book_return.update_time IS '修改时间';
+COMMENT ON COLUMN public.t_book_return.update_user_id IS '修改用户ID';
+COMMENT ON COLUMN public.t_book_return.create_user_name IS '创建用户名';
+COMMENT ON COLUMN public.t_book_return.update_user_name IS '更新用户名';
+COMMENT ON COLUMN public.t_book_return.user_id IS '用户ID';
+COMMENT ON COLUMN public.t_book_return.book_id IS '图书ID';
+COMMENT ON COLUMN public.t_book_return.borrow_id IS '借阅ID';
+COMMENT ON COLUMN public.t_book_return.return_date IS '归还日期';
