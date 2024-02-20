@@ -66,9 +66,22 @@ public class JwtUtils {
         if (isVerify) {
             SignedJWT signedJWT = SignedJWT.parse(token);
             JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            expirationTimeCheck(claimsSet);
             return claimsSet;
         } else {
             throw new RuntimeException("token解析失败");
+        }
+    }
+
+    private static void expirationTimeCheck(JWTClaimsSet claimsSet) {
+        try {
+            Date expirationTime = claimsSet.getExpirationTime();
+            Date now = new Date();
+            if (now.after(expirationTime)) {
+                throw new RuntimeException("token已过期");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("token已过期或已失效");
         }
     }
 
