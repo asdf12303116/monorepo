@@ -14,7 +14,7 @@
     <version>0.0.1</version>
     <name>root</name>
     <modules>
-        <module>member</module>
+        <module>library-management-app</module>
     </modules>
 
 

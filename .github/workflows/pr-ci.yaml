@@ -33,4 +33,4 @@ jobs:
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./member/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
+        run: mv ./library-management-app/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
