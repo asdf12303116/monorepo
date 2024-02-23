@@ -21,12 +21,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
-          restore-keys: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./member/pom.xml') }}
+          key: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./library-management-app/pom.xml') }}
+          restore-keys: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./library-management-app/pom.xml') }}
       - id: get-version
         uses: jactions/maven-version@v1.2.0
         with:
-          pom: ./member/pom.xml
+          pom: ./library-management-app/pom.xml
 
       - id: commit
         uses: prompt/actions-commit-hash@v3
