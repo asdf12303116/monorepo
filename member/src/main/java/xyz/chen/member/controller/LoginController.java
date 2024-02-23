@@ -18,12 +18,14 @@ import org.springframework.web.client.RestTemplate;
 import xyz.chen.commons.base.BaseResponse;
 import xyz.chen.commons.base.OAuthUserInfo;
 import xyz.chen.commons.base.STATUS_CODE;
+import xyz.chen.commons.base.UserInfo;
 import xyz.chen.commons.utils.JwtUtils;
 import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.entity.LoginData;
 import xyz.chen.member.services.AuthService;
 import xyz.chen.member.services.OAuthService;
 import xyz.chen.member.services.UserService;
+import xyz.chen.member.utils.UserUtils;
 
 import java.util.Map;
 
@@ -77,10 +79,6 @@ public class LoginController {
         return BaseResponse.ok("登录成功", token);
     }
 
-    @GetMapping("/login/oauth2Callback1")
-    public BaseResponse<String> oauth(@RequestParam String code) {
-        return BaseResponse.ok("code成功", code);
-    }
 
     @GetMapping("/login/oauth2Callback")
     public BaseResponse<Object> getCode(@RequestParam String code, @RequestParam String state) {
@@ -117,6 +115,14 @@ public class LoginController {
         }
 
 
+    }
+
+    @GetMapping("/flushToken")
+    public BaseResponse<Object> flushToken() {
+        UserInfo userInfo = UserUtils.getUserInfo();
+        AuthUser authUser = (AuthUser) authService.loadUserByUsername(userInfo.userName());
+        String token = JwtUtils.generateSignedJwt(authUser.getUsername(), authUser.getId(), authUser.getRoles());
+        return BaseResponse.ok(token);
     }
 
 
