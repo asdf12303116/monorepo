@@ -116,7 +116,7 @@ public class LoginController {
 
     }
 
-    @GetMapping("/flushToken")
+    @GetMapping("/refreshToken")
     public BaseResponse<Object> flushToken() {
         UserInfo userInfo = UserUtils.getUserInfo();
         AuthUser authUser = (AuthUser) authService.loadUserByUsername(userInfo.userName());
