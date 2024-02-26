@@ -5,12 +5,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import xyz.chen.commons.base.RestTemplateExceptionHandler;
 
 @Configuration
 public class HttpConfig {
     @Bean
     public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
-        return new RestTemplate(factory);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        restTemplate.setErrorHandler(new RestTemplateExceptionHandler());
+        return restTemplate;
     }
 
     @Bean

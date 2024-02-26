@@ -35,19 +35,16 @@ import java.util.Map;
 public class LoginController {
 
 
-    @Autowired
-    ClientRegistrationRepository clientRegistrationRepository;
-
-    @Autowired
-    RestTemplate restTemplate;
-
-    @Autowired
-    OAuthService oAuthService;
-
-    @Autowired
-    UserService userService;
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    ClientRegistrationRepository clientRegistrationRepository;
+    @Autowired
+    RestTemplate restTemplate;
+    @Autowired
+    OAuthService oAuthService;
+    @Autowired
+    UserService userService;
 
     public LoginController(AuthService authService, AuthenticationManager authenticationManager) {
         this.authService = authService;
@@ -98,6 +95,9 @@ public class LoginController {
 
         try {
             Map data = restTemplate.postForEntity(codeUrl, request, Map.class).getBody();
+            if (data == null) {
+                return BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_TOKEN);
+            }
             String token = (String) data.get("access_token");
             OAuthUserInfo userInfo = JwtUtils.getOAuthUserInfo(token);
             Boolean isExistsUser = userService.existsUserByOAuthUUID(userInfo.uuid());
@@ -109,7 +109,7 @@ public class LoginController {
             String loginToken = JwtUtils.generateSignedJwt(authUser.getUsername(), authUser.getId(), authUser.getRoles());
             return BaseResponse.ok("登录成功", loginToken);
         } catch (RuntimeException e) {
-            log.error("获取token出错", e);
+            log.warn("获取token出错", e);
             return BaseResponse.fail(STATUS_CODE.LOGIN_FAIL_TOKEN);
         }
 
