@@ -52,8 +52,9 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/actuator", "/actuator/**").permitAll()
-                .requestMatchers("/3").authenticated()
-                .anyRequest().permitAll()
+                .requestMatchers("/login", "/login/oauth2Callback").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**").permitAll()
+                .anyRequest().authenticated()
         );
         http.oauth2Login(Customizer.withDefaults());
         http.exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler())
