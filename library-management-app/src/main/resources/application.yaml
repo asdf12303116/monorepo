@@ -7,6 +7,8 @@ spring:
           sslkey=D:/Workspace/config/postgresql/client.key.pk8&\
           sslcert=D:/Workspace/config/postgresql/client.crt"
     username: chen
+    hikari:
+      max-lifetime: 60000
   data:
     redis:
       host: localhost

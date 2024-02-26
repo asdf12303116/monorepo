@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: "jdbc:postgresql://101.133.231.235:15432/study?\
+          ssl=true&\
+          sslmode=verify-ca&\
+          sslrootcert=D:/workspace/config/postgre/root-ca.crt&\
+          sslkey=D:/workspace/config/postgre/client.key.pk8&\
+          sslcert=D:/workspace/config/postgre/client.crt"
+    username: chen
