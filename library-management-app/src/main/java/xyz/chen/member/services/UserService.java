@@ -1,19 +1,31 @@
 package xyz.chen.member.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.chen.commons.base.OAuthUserInfo;
+import xyz.chen.member.entity.Role;
 import xyz.chen.member.entity.User;
+import xyz.chen.member.entity.dto.RoleDto;
+import xyz.chen.member.entity.dto.UserDto;
+import xyz.chen.member.entity.dto.UserWithRole;
 import xyz.chen.member.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService extends ServiceImpl<UserRepository, User> {
 
     @Autowired
-    private RoleService roleService;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRoleService userRoleService;
+
 
     public Boolean existsUserByOAuthUUID(String uuid) {
         Optional<User> user = this.lambdaQuery().eq(User::getOauth_uuid, uuid).oneOpt();
@@ -31,12 +43,30 @@ public class UserService extends ServiceImpl<UserRepository, User> {
 
     public void createOAuthUser(OAuthUserInfo oAuthUserInfo) {
         Long userId = this.createUser(oAuthUserInfo);
-        roleService.grantUserRoles(oAuthUserInfo.groups(), userId);
+        userRoleService.grantUserRoles(oAuthUserInfo.groups(), userId);
     }
 
     public Boolean deleteUserById(Long userId) {
         return removeById(userId);
     }
 
+    public UserWithRole getUserById(Long userId) {
+        User user = this.getById(userId);
+        List<Role> userRole = userRoleService.getUserRoles(userId);
+        return new UserWithRole(user, userRole);
+    }
+
+    @Transactional
+    public void saveUser(UserDto userDto) {
+        User user = new User();
+        BeanUtils.copyProperties(userDto, user);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        save(user);
+        userRoleService.grantRoles(user.getId(), userDto.getRoles().stream().map(RoleDto::roleId).toList());
+    }
+
+    public boolean checkUsernameExists(String username) {
+        return this.lambdaQuery().eq(User::getUsername, username).oneOpt().isPresent();
+    }
 
 }

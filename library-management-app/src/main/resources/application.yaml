@@ -28,7 +28,7 @@ spring:
             provider: azure
             client-id: 72c3ed3d-ba03-42ab-81e4-4ff7fba718ce
             client-secret: YoU8Q~A.KRZ1xD1pohKKyNsBqOulIM2OT.1t9cZ7
-            redirect-uri: http://localhost:8080/login/oauth2Callback
+            redirect-uri: http://localhost:8848/
             scope:
               - api://72c3ed3d-ba03-42ab-81e4-4ff7fba718ce/loginInfo
 default-prefix: cache

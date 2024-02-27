@@ -1,6 +1,6 @@
 INSERT INTO public.t_user_role (id, create_time, create_user_id, deleted, update_time, update_user_id, role_id, user_id,
                                 role_code, role_name)
-VALUES (1, null, null, null, null, null, 10000, 10000, 'admin', '管理员');
+VALUES (1, null, null, false, null, null, 10000, 10000, 'admin', '管理员');
 INSERT INTO public.t_user (id, create_time, create_user_id, deleted, update_time, update_user_id, expired, locked,
                            credentials_non_expired, enabled, nick_name, password, username)
 VALUES (10000, null, null, false, null, null, false, false, true, true, null,
