@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(
         scanBasePackages = {"xyz.chen.*"}
 )
-@MapperScan("xyz.chen.*.repository")
+@MapperScan("xyz.chen.**.repository")
 public class MemberApplication {
 
     public static void main(String[] args) {

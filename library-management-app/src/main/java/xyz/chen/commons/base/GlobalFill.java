@@ -6,12 +6,16 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xyz.chen.commons.config.ConfigData;
+import xyz.chen.member.utils.UserUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @Slf4j
 public class GlobalFill implements MetaObjectHandler {
+
+    private UserInfo userInfo;
 
     @Autowired
     private ConfigData configData;
@@ -31,12 +35,16 @@ public class GlobalFill implements MetaObjectHandler {
         this.strictUpdateFill(metaObject, "updateTime", LocalDateTime::now, LocalDateTime.class);
     }
 
-    private userInfo getUserInfo() {
-        userInfo userInfo;
-        userInfo = new userInfo(configData.getDefaultSystemId(), configData.getDefaultSystemName());
-        return userInfo;
+    private UserInfo getUserInfo() {
+        if (Objects.nonNull(this.userInfo)) {
+            return this.userInfo;
+        } else {
+            UserInfo userInfo = UserUtils.getUserInfo(configData.getDefaultSystemName(), configData.getDefaultSystemId());
+            this.userInfo = userInfo;
+            return userInfo;
+        }
+
     }
 
-    private record userInfo(Long userId, String userName) {
-    }
+
 }

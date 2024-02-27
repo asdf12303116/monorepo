@@ -9,8 +9,24 @@ public class UserUtils {
 
 
     public static UserInfo getUserInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthUser authUser = (AuthUser) authentication.getPrincipal();
-        return new UserInfo(authUser.getId(), authUser.getUsername(), authUser.getRoles());
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            AuthUser authUser = (AuthUser) authentication.getPrincipal();
+            return new UserInfo(authUser.getId(), authUser.getUsername(), authUser.getRoles());
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public static UserInfo getUserInfo(String defaultSystemName, Long defaultSystemId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            AuthUser authUser = (AuthUser) authentication.getPrincipal();
+            return new UserInfo(authUser.getId(), authUser.getUsername(), authUser.getRoles());
+        } catch (Exception e) {
+            return new UserInfo(defaultSystemId, defaultSystemName, null);
+        }
+
     }
 }
