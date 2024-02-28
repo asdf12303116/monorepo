@@ -3,6 +3,7 @@ package xyz.chen.member.config;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,8 @@ public class JacksonConfig {
 
             builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer());
             builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer());
+
+            builder.serializerByType(Long.class, ToStringSerializer.instance);
 
         };
     }
