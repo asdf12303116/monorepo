@@ -52,10 +52,12 @@ server:
       force: true
       enabled: true
 
-
 config:
   default-system-id: 10000
   default-system-name: system
+  permit-all-urls:
+    - /login
+    - /login/oauth2Callback
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

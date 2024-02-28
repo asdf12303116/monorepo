@@ -1,5 +1,6 @@
 package xyz.chen.member.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,12 +19,15 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import xyz.chen.commons.base.FilterExceptionHandler;
+import xyz.chen.commons.config.ConfigData;
 import xyz.chen.member.filter.JwtAuthenticationFilter;
 import xyz.chen.member.services.AuthService;
 import xyz.chen.member.utils.exceptionUtils;
 
 @Configuration
 public class SecurityConfig {
+    @Autowired
+    ConfigData configData;
 
 
     @Bean
@@ -52,8 +56,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/actuator", "/actuator/**").permitAll()
-                .requestMatchers("/login", "/login/oauth2Callback").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**").permitAll()
+                .requestMatchers(configData.getPermitAllUrls().toArray(String[]::new)).permitAll()
                 .anyRequest().authenticated()
         );
         http.oauth2Login(Customizer.withDefaults());
