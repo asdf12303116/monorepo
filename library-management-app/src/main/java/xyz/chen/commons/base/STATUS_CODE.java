@@ -19,6 +19,7 @@ public enum STATUS_CODE {
     LOGIN_FAIL_STATUS(401230, "用户状态异常，请联系管理员"),
     LOGIN_EXPIRED(401500, "登陆过期"),
     CREATE_USER_FAIL(401600, "创建用户错误"),
+    UPDATE_USER_FAIL(401700, "更新用户错误"),
     ACCESS_DENIED_REQUIRE(40310, "需要登陆"),
     ACCESS_DENIED_ERROR(40300, "权限不足"),
     NOT_FOUND(40400, "资源不存在"),

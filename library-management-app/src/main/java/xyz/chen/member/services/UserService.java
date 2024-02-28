@@ -69,4 +69,19 @@ public class UserService extends ServiceImpl<UserRepository, User> {
         return this.lambdaQuery().eq(User::getUsername, username).oneOpt().isPresent();
     }
 
+    public boolean checkUserExists(Long userId) {
+        return lambdaQuery().eq(User::getId, userId).oneOpt().isPresent();
+    }
+
+    @Transactional
+    public void updateUser(UserDto userDto) {
+        User user = lambdaQuery().eq(User::getId, userDto.getId()).one();
+        BeanUtils.copyProperties(userDto, user);
+        if (userDto.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
+        updateById(user);
+        userRoleService.updateRoles(user.getId(), userDto.getRoles().stream().map(RoleDto::roleId).toList());
+    }
+
 }

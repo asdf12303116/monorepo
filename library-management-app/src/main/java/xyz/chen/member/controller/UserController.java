@@ -33,4 +33,16 @@ public class UserController {
         return BaseResponse.ok("添加成功");
     }
 
+    @PostMapping("/update")
+    public BaseResponse<String> updateUser(@RequestBody UserDto userDto) {
+        boolean isUserExists = userService.checkUserExists(userDto.getId());
+        if (!isUserExists) {
+            return BaseResponse.fail(STATUS_CODE.UPDATE_USER_FAIL, "用户不存在");
+        }
+        userService.updateUser(userDto);
+        return BaseResponse.ok("更新成功");
+    }
+
+
+
 }
