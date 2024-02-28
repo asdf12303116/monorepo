@@ -43,11 +43,11 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
     }
 
     @Transactional
-    public Boolean grantRoles(Long userId, List<Long> roleIds) {
+    public void grantRoles(Long userId, List<Long> roleIds) {
         var userRoles = lambdaQuery().eq(UserRole::getUserId, userId)
                 .in(UserRole::getRoleId, roleIds)
                 .list();
-        var roles = roleService.getBaseMapper().selectBatchIds(roleIds);
+        var roles = roleService.getRolesByIds(roleIds);
         List<UserRole> userRoleList = new ArrayList<>();
         roles.forEach(role -> {
             UserRole userRole = userRoles.stream()
@@ -62,6 +62,25 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
         });
         saveOrUpdateBatch(userRoleList);
 
-        return true;
+    }
+
+    @Transactional
+    public void removeUserRolesByUserId(Long userId) {
+        lambdaUpdate().eq(UserRole::getUserId, userId).remove();
+    }
+
+    @Transactional
+    public void updateRoles(Long userId, List<Long> roleIds) {
+        removeUserRolesByUserId(userId);
+        var newRoles = roleService.getRolesByIds(roleIds);
+        List<UserRole> userRoleList = newRoles.stream().map(role -> {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(userId);
+            userRole.setRoleId(role.getId());
+            userRole.setRoleCode(role.getRoleCode());
+            userRole.setRoleName(role.getRoleName());
+            return userRole;
+        }).toList();
+        saveOrUpdateBatch(userRoleList);
     }
 }
