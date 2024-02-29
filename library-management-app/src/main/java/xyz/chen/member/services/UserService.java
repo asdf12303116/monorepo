@@ -75,13 +75,27 @@ public class UserService extends ServiceImpl<UserRepository, User> {
 
     @Transactional
     public void updateUser(UserDto userDto) {
+        editUser(userDto);
+        userRoleService.updateRoles(userDto.getId(), userDto.getRoles().stream().map(RoleDto::roleId).toList());
+    }
+
+    @Transactional
+    public void editUser(UserDto userDto) {
         User user = lambdaQuery().eq(User::getId, userDto.getId()).one();
         BeanUtils.copyProperties(userDto, user);
         if (userDto.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
         updateById(user);
-        userRoleService.updateRoles(user.getId(), userDto.getRoles().stream().map(RoleDto::roleId).toList());
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        boolean isDelete = lambdaUpdate().eq(User::getId, userId).remove();
+        if (isDelete) {
+            userRoleService.removeUserRolesByUserId(userId);
+        }
+
     }
 
 }

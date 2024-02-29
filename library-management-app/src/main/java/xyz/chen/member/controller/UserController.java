@@ -1,6 +1,7 @@
 package xyz.chen.member.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.chen.commons.base.BaseResponse;
 import xyz.chen.commons.base.STATUS_CODE;
@@ -34,6 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasRole('admin')")
     public BaseResponse<String> updateUser(@RequestBody UserDto userDto) {
         boolean isUserExists = userService.checkUserExists(userDto.getId());
         if (!isUserExists) {
@@ -41,6 +43,27 @@ public class UserController {
         }
         userService.updateUser(userDto);
         return BaseResponse.ok("更新成功");
+    }
+
+    @PostMapping("/edit")
+    public BaseResponse<String> updateUserSelf(@RequestBody UserDto userDto) {
+        boolean isUserExists = userService.checkUserExists(userDto.getId());
+        if (!isUserExists) {
+            return BaseResponse.fail(STATUS_CODE.UPDATE_USER_FAIL, "用户不存在");
+        }
+        userService.editUser(userDto);
+        return BaseResponse.ok("更新成功");
+    }
+
+    @PostMapping("/delete")
+    @PreAuthorize("hasRole('admin')")
+    public BaseResponse<String> deleteUser(@RequestBody UserDto userDto) {
+        boolean isUserExists = userService.checkUserExists(userDto.getId());
+        if (!isUserExists) {
+            return BaseResponse.fail(STATUS_CODE.UPDATE_USER_FAIL, "用户不存在");
+        }
+        userService.deleteUser(userDto.getId());
+        return BaseResponse.ok("删除成功");
     }
 
 

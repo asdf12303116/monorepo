@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.chen.commons.base.BaseEntity;
 import xyz.chen.member.entity.Role;
 import xyz.chen.member.entity.UserRole;
 import xyz.chen.member.repository.UserRoleRepository;
@@ -69,12 +70,36 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
         lambdaUpdate().eq(UserRole::getUserId, userId).remove();
     }
 
+//    @Transactional
+//    public void updateRoles(Long userId, List<Long> roleIds) {
+//        removeUserRolesByUserId(userId);
+//        var newRoles = roleService.getRolesByIds(roleIds);
+//        List<UserRole> userRoleList = newRoles.stream().map(role -> {
+//            UserRole userRole = new UserRole();
+//            userRole.setUserId(userId);
+//            userRole.setRoleId(role.getId());
+//            userRole.setRoleCode(role.getRoleCode());
+//            userRole.setRoleName(role.getRoleName());
+//            return userRole;
+//        }).toList();
+//        saveOrUpdateBatch(userRoleList);
+//    }
+
     @Transactional
     public void updateRoles(Long userId, List<Long> roleIds) {
-        removeUserRolesByUserId(userId);
-        var newRoles = roleService.getRolesByIds(roleIds);
-        List<UserRole> userRoleList = newRoles.stream().map(role -> {
-            UserRole userRole = new UserRole();
+        var ownedUserRoles = lambdaQuery().eq(UserRole::getUserId, userId).list();
+        var targetRoles = roleService.getRolesByIds(roleIds);
+        var needDeleteRoles = ownedUserRoles.stream().filter(ownedUserRole -> targetRoles.stream()
+                        .noneMatch(role -> role.getId().equals(ownedUserRole.getRoleId())))
+                .map(BaseEntity::getId).toList();
+        if (!needDeleteRoles.isEmpty()) {
+            getBaseMapper().deleteBatchIds(needDeleteRoles);
+        }
+        List<UserRole> userRoleList = targetRoles.stream().map(role -> {
+            UserRole userRole = ownedUserRoles.stream()
+                    .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
+                    .findFirst()
+                    .orElseGet(UserRole::new);
             userRole.setUserId(userId);
             userRole.setRoleId(role.getId());
             userRole.setRoleCode(role.getRoleCode());
