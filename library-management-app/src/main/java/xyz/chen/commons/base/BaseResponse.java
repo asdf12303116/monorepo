@@ -1,8 +1,12 @@
 package xyz.chen.commons.base;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -12,6 +16,7 @@ public class BaseResponse<T> {
     private String message;
     private Boolean success;
     private T body;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PageInfo page;
 
     public BaseResponse(T body, Boolean isSuccess, Integer code, String message) {
@@ -44,6 +49,10 @@ public class BaseResponse<T> {
 
     public static <T> BaseResponse<T> ok(T body, PageInfo page) {
         return new BaseResponse<>(true, STATUS_CODE.OK, "操作成功", body, page);
+    }
+
+    public static <T> BaseResponse<List<T>> ok(Page<T> page) {
+        return new BaseResponse<>(true, STATUS_CODE.OK, "操作成功", page.getRecords(), new PageInfo(page));
     }
 
     public static <T> BaseResponse<T> ok(T body) {
