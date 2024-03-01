@@ -25,6 +25,7 @@ export function getToken(): LoginUser {
   const rawData = Cookies.get(TokenKey)
     ? JSON.parse(Cookies.get(TokenKey))
     : storageSession().getItem(sessionKey);
+  if (!rawData) return null;
   if (rawData.expires instanceof Date) {
     return rawData;
   } else {

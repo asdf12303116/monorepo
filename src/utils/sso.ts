@@ -1,5 +1,6 @@
-import { removeToken, setToken, type DataInfo } from "./auth";
+import { removeToken, setToken, getLoginUser } from "./auth";
 import { subBefore, getQueryMap } from "@pureadmin/utils";
+import { api } from "@/api";
 
 /**
  * 简版前端单点登录，根据实际业务自行编写
@@ -10,10 +11,16 @@ import { subBefore, getQueryMap } from "@pureadmin/utils";
  * 3.删除不需要显示在 url 的参数
  * 4.使用 window.location.replace 跳转正确页面
  */
+export type ssoInfo = {
+  code: string;
+  state: string;
+  session_state: string;
+};
+
 (function () {
   // 获取 url 中的参数
-  const params = getQueryMap(location.href) as DataInfo<Date>;
-  const must = ["username", "roles", "accessToken"];
+  const params = getQueryMap(location.href) as ssoInfo;
+  const must = ["code", "state", "session_state"];
   const mustLength = must.length;
   if (Object.keys(params).length !== mustLength) return;
 
@@ -36,23 +43,25 @@ import { subBefore, getQueryMap } from "@pureadmin/utils";
     // 清空本地旧信息
     removeToken();
 
-    // 保存新信息到本地
-    setToken(params);
+    api.ssoToken(params).then(res => {
+      // 删除不需要显示在 url 的参数
+      delete params["code"];
+      delete params["state"];
+      delete params["session_state"];
 
-    // 删除不需要显示在 url 的参数
-    delete params["roles"];
-    delete params["accessToken"];
-
-    const newUrl = `${location.origin}${location.pathname}${subBefore(
-      location.hash,
-      "?"
-    )}?${JSON.stringify(params)
-      .replace(/["{}]/g, "")
-      .replace(/:/g, "=")
-      .replace(/,/g, "&")}`;
-
-    // 替换历史记录项
-    window.location.replace(newUrl);
+      const newUrl = `${location.origin}${location.pathname}${subBefore(
+        location.hash,
+        "?"
+      )}?${JSON.stringify(params)
+        .replace(/["{}]/g, "")
+        .replace(/:/g, "=")
+        .replace(/,/g, "&")}`;
+      if (res.success) {
+        const user = getLoginUser(res.body);
+        setToken(user);
+      }
+      window.location.replace(newUrl);
+    });
   } else {
     return;
   }

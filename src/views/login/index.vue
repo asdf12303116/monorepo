@@ -60,6 +60,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   });
 };
 
+const ssoLogin = async () => {
+  window.location.href = "/api/oauth2/authorization/azure-dev";
+};
+
 /** 使用公共函数，避免`removeEventListener`失效 */
 function onkeypress({ code }: KeyboardEvent) {
   if (code === "Enter") {
@@ -147,6 +151,16 @@ onBeforeUnmount(() => {
                 @click="onLogin(ruleFormRef)"
               >
                 登录
+              </el-button>
+            </Motion>
+            <Motion :delay="250">
+              <el-button
+                class="w-full mt-4"
+                size="default"
+                type="primary"
+                @click="ssoLogin"
+              >
+                SSO登录
               </el-button>
             </Motion>
           </el-form>

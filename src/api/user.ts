@@ -1,5 +1,6 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/base";
+import { ssoInfo } from "@/utils/sso";
 
 export type UserResult = {
   success: boolean;
@@ -53,13 +54,22 @@ export const refreshTokenApi = (data?: object) => {
   return http.request<RefreshTokenResult>("post", "/refreshToken", { data });
 };
 
+export const login = (data?: object) => {
+  return http.request<LoginResult>("post", baseUrlApi("/login"), { data });
+};
+export const refreshToken = (data?: object) => {
+  return http.request<LoginResult>("get", baseUrlApi("/refreshToken"), {
+    data
+  });
+};
+
+export const ssoToken = (data: ssoInfo) => {
+  return http.request<LoginResult>("get", baseUrlApi("/login/oauth2Callback"), {
+    params: data
+  });
+};
 export default {
-  login: (data?: object) => {
-    return http.request<LoginResult>("post", baseUrlApi("/login"), { data });
-  },
-  refreshToken: (data?: object) => {
-    return http.request<LoginResult>("get", baseUrlApi("/refreshToken"), {
-      data
-    });
-  }
+  login,
+  refreshToken,
+  ssoToken
 };
