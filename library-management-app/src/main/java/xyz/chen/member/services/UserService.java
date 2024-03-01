@@ -1,5 +1,6 @@
 package xyz.chen.member.services;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,17 @@ public class UserService extends ServiceImpl<UserRepository, User> {
             userRoleService.removeUserRolesByUserId(userId);
         }
 
+    }
+
+    public Page<UserWithRole> getAllUsers() {
+        Page<User> page = new Page<>(1, 10);
+        var users = baseMapper.selectPage(page, lambdaQuery().getWrapper());
+
+        var userWithRoles = userRoleService.getUserWithRoles(users);
+        Page<UserWithRole> userWithRolePage = new Page<>();
+        BeanUtils.copyProperties(users, userWithRolePage);
+        userWithRolePage.setRecords(userWithRoles);
+        return userWithRolePage;
     }
 
 }
