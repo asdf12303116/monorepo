@@ -25,6 +25,7 @@ public interface AuthUserRepository extends BaseMapper<AuthUser> {
                      JOIN t_user_role ON t_user.id = t_user_role.user_id
             where
             t_user.deleted = false and
+            t_user_role.deleted = false and
             t_user.username = #{username}
             GROUP BY t_user.id
             """)
@@ -46,6 +47,7 @@ public interface AuthUserRepository extends BaseMapper<AuthUser> {
                      JOIN t_user_role ON t_user.id = t_user_role.user_id
             where
             t_user.deleted = false and
+            t_user_role.deleted = false and
             t_user.oauth_uuid = #{uuid}
             GROUP BY t_user.id
             """)
