@@ -11,6 +11,8 @@ import xyz.chen.member.entity.dto.UserWithRole;
 import xyz.chen.member.services.UserService;
 import xyz.chen.member.utils.UserUtils;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -35,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public BaseResponse<String> updateUser(@RequestBody UserDto userDto) {
         boolean isUserExists = userService.checkUserExists(userDto.getId());
         if (!isUserExists) {
@@ -56,7 +58,7 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public BaseResponse<String> deleteUser(@RequestBody UserDto userDto) {
         boolean isUserExists = userService.checkUserExists(userDto.getId());
         if (!isUserExists) {
@@ -64,6 +66,13 @@ public class UserController {
         }
         userService.deleteUser(userDto.getId());
         return BaseResponse.ok("删除成功");
+    }
+
+
+    @PostMapping("/list")
+    @PreAuthorize("hasAuthority('admin')")
+    public BaseResponse<List<UserWithRole>> getUsers() {
+        return BaseResponse.ok(userService.getAllUsers());
     }
 
 
