@@ -1,12 +1,15 @@
 package xyz.chen.member.services;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.chen.commons.base.BaseEntity;
 import xyz.chen.member.entity.Role;
+import xyz.chen.member.entity.User;
 import xyz.chen.member.entity.UserRole;
+import xyz.chen.member.entity.dto.UserWithRole;
 import xyz.chen.member.repository.UserRoleRepository;
 
 import java.util.ArrayList;
@@ -108,4 +111,21 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
         }).toList();
         saveOrUpdateBatch(userRoleList);
     }
+
+
+    public List<UserWithRole> getUserWithRoles(Page<User> page) {
+        List<Long> userIds = page.getRecords().stream().map(User::getId).toList();
+        List<UserRole> userRoles = lambdaQuery().in(UserRole::getUserId, userIds).list();
+
+        List<UserWithRole> userWithRoles = new ArrayList<>();
+        page.getRecords().forEach(user -> {
+            List<Role> userRolesData = userRoles.stream()
+                    .filter(userRole -> userRole.getUserId().equals(user.getId()))
+                    .map(userRole -> new Role(userRole.getRoleName(), userRole.getRoleCode(), userRole.getRoleId())).toList();
+            userWithRoles.add(new UserWithRole(user, userRolesData));
+        });
+        return userWithRoles;
+    }
+
+
 }

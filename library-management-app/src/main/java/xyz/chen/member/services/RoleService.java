@@ -1,5 +1,6 @@
 package xyz.chen.member.services;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,11 @@ public class RoleService extends ServiceImpl<RoleRepository, Role> {
     @Transactional
     public void removeRolesByIds(List<Long> roleIds) {
         removeByIds(roleIds);
+    }
+
+    public Page<Role> getAllRoles() {
+        Page<Role> Page = new Page<>(1, 10);
+        return baseMapper.selectPage(Page, lambdaQuery().getWrapper());
     }
 
 
