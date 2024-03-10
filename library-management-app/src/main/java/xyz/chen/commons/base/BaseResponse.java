@@ -75,4 +75,8 @@ public class BaseResponse<T> {
         return new BaseResponse<>(false, statusCode);
     }
 
+    public static BaseResponse<String> ok(){
+        return new BaseResponse<>(true, STATUS_CODE.OK, "操作成功", null);
+    }
+
 }

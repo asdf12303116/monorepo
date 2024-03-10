@@ -1,5 +1,7 @@
 package xyz.chen.member.services;
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import xyz.chen.commons.base.BaseEntity;
 import xyz.chen.member.entity.Role;
 import xyz.chen.member.entity.User;
 import xyz.chen.member.entity.UserRole;
+import xyz.chen.member.entity.dto.UserRoleSearchDto;
 import xyz.chen.member.entity.dto.UserWithRole;
 import xyz.chen.member.repository.UserRoleRepository;
 
@@ -46,6 +49,17 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
                 .list().stream().map(userRole -> new Role(userRole.getRoleName(), userRole.getRoleCode(), userRole.getRoleId())).toList();
     }
 
+    public Page<UserRole> getUserRoles(UserRoleSearchDto userRoleSearchDto) {
+        Page<UserRole> page = new Page<>(userRoleSearchDto.pageInfo().getPageNum(), userRoleSearchDto.pageInfo().getPageSize());
+        return baseMapper.selectPage(page, lambdaQuery()
+                .eq(NumberUtil.isValidNumber(userRoleSearchDto.id()),UserRole::getId,userRoleSearchDto.id())
+                .eq(NumberUtil.isValidNumber(userRoleSearchDto.userId()),UserRole::getUserId,userRoleSearchDto.userId())
+                .likeRight(StrUtil.isNotBlank(userRoleSearchDto.roleName()),UserRole::getRoleName,userRoleSearchDto.roleName())
+                .likeRight(StrUtil.isNotBlank(userRoleSearchDto.roleCode()),UserRole::getRoleCode,userRoleSearchDto.roleCode())
+                .getWrapper()
+        );
+    }
+
     @Transactional
     public void grantRoles(Long userId, List<Long> roleIds) {
         var userRoles = lambdaQuery().eq(UserRole::getUserId, userId)
@@ -53,19 +67,21 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
                 .list();
         var roles = roleService.getRolesByIds(roleIds);
         List<UserRole> userRoleList = new ArrayList<>();
-        roles.forEach(role -> {
-            UserRole userRole = userRoles.stream()
-                    .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
-                    .findFirst()
-                    .orElseGet(UserRole::new);
-            userRole.setUserId(userId);
-            userRole.setRoleId(role.getId());
-            userRole.setRoleCode(role.getRoleCode());
-            userRole.setRoleName(role.getRoleName());
-            userRoleList.add(userRole);
-        });
+        roles.forEach(role -> userRoleList.add(getUserRoleInfo(userId, userRoles, role)));
         saveOrUpdateBatch(userRoleList);
 
+    }
+
+    private UserRole getUserRoleInfo(Long userId, List<UserRole> userRoles, Role role) {
+        UserRole userRole = userRoles.stream()
+                .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
+                .findFirst()
+                .orElseGet(UserRole::new);
+        userRole.setUserId(userId);
+        userRole.setRoleId(role.getId());
+        userRole.setRoleCode(role.getRoleCode());
+        userRole.setRoleName(role.getRoleName());
+        return userRole;
     }
 
     @Transactional
@@ -98,17 +114,7 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
         if (!needDeleteRoles.isEmpty()) {
             getBaseMapper().deleteBatchIds(needDeleteRoles);
         }
-        List<UserRole> userRoleList = targetRoles.stream().map(role -> {
-            UserRole userRole = ownedUserRoles.stream()
-                    .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
-                    .findFirst()
-                    .orElseGet(UserRole::new);
-            userRole.setUserId(userId);
-            userRole.setRoleId(role.getId());
-            userRole.setRoleCode(role.getRoleCode());
-            userRole.setRoleName(role.getRoleName());
-            return userRole;
-        }).toList();
+        List<UserRole> userRoleList = targetRoles.stream().map(role -> getUserRoleInfo(userId, ownedUserRoles, role)).toList();
         saveOrUpdateBatch(userRoleList);
     }
 
