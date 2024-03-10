@@ -1,5 +1,8 @@
 package xyz.chen.member.services;
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -12,6 +15,7 @@ import xyz.chen.member.entity.Role;
 import xyz.chen.member.entity.User;
 import xyz.chen.member.entity.dto.RoleDto;
 import xyz.chen.member.entity.dto.UserDto;
+import xyz.chen.member.entity.dto.UserSearchDto;
 import xyz.chen.member.entity.dto.UserWithRole;
 import xyz.chen.member.repository.UserRepository;
 
@@ -103,6 +107,24 @@ public class UserService extends ServiceImpl<UserRepository, User> {
         Page<User> page = new Page<>(1, 10);
         var users = baseMapper.selectPage(page, lambdaQuery().getWrapper());
 
+        var userWithRoles = userRoleService.getUserWithRoles(users);
+        Page<UserWithRole> userWithRolePage = new Page<>();
+        BeanUtils.copyProperties(users, userWithRolePage);
+        userWithRolePage.setRecords(userWithRoles);
+        return userWithRolePage;
+    }
+
+    public Page<UserWithRole> searchUsers(UserSearchDto userSearchDto) {
+        Page<User> page = new Page<>(userSearchDto.pageInfo().getPageNum(), userSearchDto.pageInfo().getPageSize());
+        var users = baseMapper.selectPage(page, lambdaQuery()
+                .eq(NumberUtil.isValidNumber(userSearchDto.id()),User::getId,userSearchDto.id())
+                .likeRight(StrUtil.isNotEmpty(userSearchDto.username()),User::getUsername,userSearchDto.username())
+                .likeRight(StrUtil.isNotEmpty(userSearchDto.nickName()),User::getNickName,userSearchDto.nickName())
+                .getWrapper()
+        );
+        if (users.getRecords().isEmpty()) {
+          return   new Page<>();
+        }
         var userWithRoles = userRoleService.getUserWithRoles(users);
         Page<UserWithRole> userWithRolePage = new Page<>();
         BeanUtils.copyProperties(users, userWithRolePage);
