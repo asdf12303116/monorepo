@@ -115,7 +115,7 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
 
     public List<UserWithRole> getUserWithRoles(Page<User> page) {
         List<Long> userIds = page.getRecords().stream().map(User::getId).toList();
-        List<UserRole> userRoles = lambdaQuery().in(UserRole::getUserId, userIds).list();
+        List<UserRole> userRoles = lambdaQuery().in(!userIds.isEmpty(),UserRole::getUserId, userIds).list();
 
         List<UserWithRole> userWithRoles = new ArrayList<>();
         page.getRecords().forEach(user -> {
