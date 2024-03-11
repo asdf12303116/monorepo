@@ -30,24 +30,63 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
 
     @Transactional
     public void grantUserRoles(List<String> groups, Long userId) {
-        List<Role> roles = oAuthRoleService.getRolesByGroups(groups);
+//        List<Role> roles = oAuthRoleService.getRolesByGroups(groups);
+//
+//        List<UserRole> userRoles = new ArrayList<>();
+//        roles.forEach(role -> {
+//            UserRole userRole = new UserRole();
+//            userRole.setUserId(userId);
+//            userRole.setRoleId(role.getId());
+//            userRole.setRoleCode(role.getRoleCode());
+//            userRole.setRoleName(role.getRoleName());
+//            userRoles.add(userRole);
+//        });
+//        saveOrUpdateBatch(userRoles);
 
-        List<UserRole> userRoles = new ArrayList<>();
-        roles.forEach(role -> {
-            UserRole userRole = new UserRole();
-            userRole.setUserId(userId);
-            userRole.setRoleId(role.getId());
-            userRole.setRoleCode(role.getRoleCode());
-            userRole.setRoleName(role.getRoleName());
-            userRoles.add(userRole);
-        });
-        saveOrUpdateBatch(userRoles);
+        //新逻辑
+        // 当前组角色
+        List<Role> groupRoles = oAuthRoleService.getRolesByGroups(groups);
+
+        // 当前用户组角色
+        List<UserRole> userRolesData = getUserGroupRolesByUserId(userId);
+
+        // 需要移除组
+        List<Long> removeGroupIds = userRolesData.stream()
+                .map(UserRole::getRoleId)
+                .filter(roleId -> groupRoles.stream().noneMatch(role -> role.getId().equals(roleId)))
+                .toList();
+        if (!removeGroupIds.isEmpty()) {
+            lambdaUpdate().in(UserRole::getRoleId, removeGroupIds).remove();
+        }
+        // 更新组
+        List<UserRole> userRoleList = groupRoles.stream().map(role -> getUserRole(userId, userRolesData, role)).toList();
+        saveOrUpdateBatch(userRoleList);
+    }
+
+    private UserRole getUserRole(Long userId, List<UserRole> userRolesData, Role role) {
+        UserRole userRole = userRolesData.stream()
+                .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
+                .findFirst()
+                .orElseGet(UserRole::new);
+        userRole.setUserId(userId);
+        userRole.setRoleId(role.getId());
+        userRole.setRoleCode(role.getRoleCode());
+        userRole.setRoleName(role.getRoleName());
+        return userRole;
     }
 
     public List<Role> getUserRoles(Long userId) {
         return this.lambdaQuery().eq(UserRole::getUserId, userId)
                 .list().stream().map(userRole -> new Role(userRole.getRoleName(), userRole.getRoleCode(), userRole.getRoleId())).toList();
     }
+
+    public List<UserRole> getUserGroupRolesByUserId(Long userId) {
+        List<Long> groupsRoleIds = oAuthRoleService.getGroupsRoleIds();
+        return lambdaQuery().eq(UserRole::getUserId, userId)
+                .in(UserRole::getRoleId, groupsRoleIds)
+                .list();
+    }
+
 
     public Page<UserRole> getUserRoles(UserRoleSearchDto userRoleSearchDto) {
         Page<UserRole> page = new Page<>(userRoleSearchDto.pageInfo().getPageNum(), userRoleSearchDto.pageInfo().getPageSize());
@@ -73,15 +112,7 @@ public class UserRoleService extends ServiceImpl<UserRoleRepository, UserRole> {
     }
 
     private UserRole getUserRoleInfo(Long userId, List<UserRole> userRoles, Role role) {
-        UserRole userRole = userRoles.stream()
-                .filter(userRoleData -> userRoleData.getRoleId().equals(role.getId()))
-                .findFirst()
-                .orElseGet(UserRole::new);
-        userRole.setUserId(userId);
-        userRole.setRoleId(role.getId());
-        userRole.setRoleCode(role.getRoleCode());
-        userRole.setRoleName(role.getRoleName());
-        return userRole;
+        return getUserRole(userId, userRoles, role);
     }
 
     @Transactional

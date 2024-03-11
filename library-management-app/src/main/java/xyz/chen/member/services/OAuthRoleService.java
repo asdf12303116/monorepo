@@ -32,5 +32,11 @@ public class OAuthRoleService extends ServiceImpl<OAuthRoleRepository, OAuthRole
 
     }
 
+    public List<Long> getGroupsRoleIds() {
+        return lambdaQuery()
+                .select(OAuthRoleMap::getRoleId)
+                .list().stream().map(OAuthRoleMap::getRoleId).toList();
+    }
+
 
 }

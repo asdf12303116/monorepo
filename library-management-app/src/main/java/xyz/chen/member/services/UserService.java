@@ -45,10 +45,24 @@ public class UserService extends ServiceImpl<UserRepository, User> {
         return user.getId();
     }
 
+    public void updateUser(OAuthUserInfo oAuthUserInfo) {
+        User user = lambdaQuery().eq(User::getOauth_uuid, oAuthUserInfo.uuid()).one();
+        if (!user.getNickName().equals(oAuthUserInfo.showName())) {
+            saveOrUpdate(user);
+        }
+    }
+
+
     @Transactional
     public void createOAuthUser(OAuthUserInfo oAuthUserInfo) {
         Long userId = this.createUser(oAuthUserInfo);
         userRoleService.grantUserRoles(oAuthUserInfo.groups(), userId);
+    }
+
+    @Transactional
+    public void updateOAuthUser(OAuthUserInfo oAuthUserInfo) {
+        this.updateUser(oAuthUserInfo);
+        userRoleService.grantUserRoles(oAuthUserInfo.groups(), lambdaQuery().eq(User::getOauth_uuid, oAuthUserInfo.uuid()).one().getId());
     }
 
     public Boolean deleteUserById(Long userId) {
