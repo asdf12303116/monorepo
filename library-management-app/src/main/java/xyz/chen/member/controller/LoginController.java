@@ -104,6 +104,8 @@ public class LoginController {
 
             if (!isExistsUser) {
                 userService.createOAuthUser(userInfo);
+            } else {
+                userService.updateOAuthUser(userInfo);
             }
             AuthUser authUser = (AuthUser) authService.loadUserByOAuthUUID(userInfo.uuid());
             String loginToken = JwtUtils.generateSignedJwt(authUser.getUsername(), authUser.getId(), authUser.getRoles());
