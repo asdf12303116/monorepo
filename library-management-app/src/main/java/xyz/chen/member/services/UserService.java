@@ -2,7 +2,6 @@ package xyz.chen.member.services;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +45,7 @@ public class UserService extends ServiceImpl<UserRepository, User> {
         return user.getId();
     }
 
+    @Transactional
     public void createOAuthUser(OAuthUserInfo oAuthUserInfo) {
         Long userId = this.createUser(oAuthUserInfo);
         userRoleService.grantUserRoles(oAuthUserInfo.groups(), userId);

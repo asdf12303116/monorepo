@@ -55,6 +55,7 @@ server:
 config:
   default-system-id: 10000
   default-system-name: system
+  default-oauth-role: 20000
   permit-all-urls:
     - /login
     - /login/oauth2Callback

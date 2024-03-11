@@ -17,4 +17,5 @@ public class ConfigData {
     private String defaultSystemName = "system";
     private String defaultSharedSecret = "asdf12303116";
     private List<String> permitAllUrls = List.of("");
+    private Long defaultOauthRole = 20000L;
 }
