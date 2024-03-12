@@ -2,7 +2,7 @@ package xyz.chen.member.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import xyz.chen.commons.config.ConfigData;
 import xyz.chen.member.entity.OAuthRoleMap;
 import xyz.chen.member.entity.Role;
@@ -11,7 +11,7 @@ import xyz.chen.member.repository.RoleRepository;
 
 import java.util.List;
 
-@Component
+@Service
 public class OAuthRoleService extends ServiceImpl<OAuthRoleRepository, OAuthRoleMap> {
 
     @Autowired
