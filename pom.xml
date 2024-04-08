@@ -29,7 +29,7 @@
         <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
         <java.version>21</java.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
-        <springdoc.version>2.4.0</springdoc.version>
+        <springdoc.version>2.5.0</springdoc.version>
     </properties>
     <dependencyManagement>
         <dependencies>
