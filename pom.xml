@@ -26,7 +26,7 @@
         <hutool.version>5.8.27</hutool.version>
         <jib.version>3.4.0</jib.version>
         <servlet-api.version>6.0.0</servlet-api.version>
-        <nimbus-jose-jwt.version>9.39</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
         <java.version>21</java.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
         <springdoc.version>2.5.0</springdoc.version>
