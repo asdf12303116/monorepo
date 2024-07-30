@@ -25,7 +25,7 @@
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <hutool.version>5.8.29</hutool.version>
         <jib.version>3.4.0</jib.version>
-        <servlet-api.version>6.0.0</servlet-api.version>
+        <servlet-api.version>6.1.0</servlet-api.version>
         <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
         <java.version>21</java.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
