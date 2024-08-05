@@ -28,7 +28,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
         <java.version>21</java.version>
-        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
         <springdoc.version>2.6.0</springdoc.version>
     </properties>
     <dependencyManagement>
