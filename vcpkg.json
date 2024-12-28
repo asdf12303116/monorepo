@@ -1,0 +1,18 @@
+{
+  "name" : "esp32-host-newapp",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "20a72ce99b12dd0ebfea5d39f32681bd68b19d03",
+  "dependencies" : [ {
+    "name" : "cpp-httplib",
+    "version>=" : "0.18.0"
+  }, {
+    "name" : "inih",
+    "version>=" : "58"
+  }, {
+    "name" : "jsoncpp",
+    "version>=" : "1.9.6"
+  }, {
+    "name" : "spdlog",
+    "version>=" : "1.15.0#1"
+  } ]
+}
