@@ -5,6 +5,7 @@
 #include <ESP32Time.h>
 #include "ESPAsyncWebServer.h"
 #include <WebServer.h>
+#include <ArduinoJson.h>
 
 
 extern  struct sensor_data sensor_data;
@@ -39,4 +40,7 @@ extern const long utcOffsetInSeconds; // Beijing: UTC +8  -- 获取东八区时�
 extern ESP32Time rtc;
 extern tm timeinfo;
 extern int port;
+
+extern JsonDocument serial_json_data;
+extern bool serial_json_data_updated;
 #endif // ESP32_GLOBAL_H

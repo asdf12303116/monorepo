@@ -1,14 +1,11 @@
 #include <Arduino.h>
 
 #include <lvgl.h>
-#include <lvgl_port_v8.h>
 #include <ui.h>
 #include <WiFi_Config.h>
-#include <ESP32Time.h>
 #include <WebServer.h>
 #include <Ticker.h>
 #include <Lcd.h>
-#include <ui.h>
 #include <global.h>
 #include <Config.h>
 #include <update.h>
@@ -70,6 +67,13 @@ void setup() {
 }
 
 void loop() {
+    if (Serial.available() > 0) {
+        String msg = Serial.readStringUntil('\n');
+        read_data(msg);
+        if (serial_json_data_updated) {
+            update_data(serial_json_data, SERIAL_UPDATE);
+        }
+    }
     if (tft_bl_on) {
         lv_timer_handler(); /* let the GUI do its work */
         if (millis() - last_ms >= 500) {

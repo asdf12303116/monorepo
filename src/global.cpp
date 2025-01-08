@@ -34,4 +34,6 @@ ESP32Time rtc;
 tm timeinfo;
 int port = 9780;
 
+JsonDocument serial_json_data;
+bool serial_json_data_updated = false;
 AsyncWebServer server(port);
