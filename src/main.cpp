@@ -83,7 +83,6 @@ int main() {
         if (data_err) {
             get_sensor_reading_data(sensor_addr_list, sensor_dto_reading_vector,sensor_dto_addr_vector,data_err);
         }
-        // spdlog::debug("reading sensor data...");
         std::string json_str = reading_sensor(sensor_dto_reading_vector,config.fps_source,fwriter,data_err);
        
 

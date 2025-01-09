@@ -75,6 +75,7 @@ int get_sensor_reading_data(const SENSOR_ADDR_VECTOR & sensor_addr_list, SENSOR_
     SENSOR_READING_DATA_VECTOR hwinfo_raw_data_vector;
     int hwinfo_data_result = GetSharedData(hwinfo_raw_data_vector);
     if (hwinfo_data_result < 0) {
+        spdlog::error("Get HWiNFO64 Shared Memory Data Error");
         return -1;
     }
 
@@ -164,10 +165,18 @@ std::string reading_sensor(const SENSOR_DTO_READING_VECTOR & sensor_dto_reading_
 
     // 检查数据
     std::string gpu_core_volt = show_data["gpu_core_volt"].asString();
-    double gpu_core_volt_value = std::stod(gpu_core_volt);
-    if (gpu_core_volt_value > GPU_VOLTAGE_MAX || gpu_core_volt_value < GPU_VOLTAGE_MIN) {
-        spdlog::error("gpu_core_volt value error: {}",gpu_core_volt_value);
+    if (gpu_core_volt.empty()) {
+        std::string error_msg = "gpu_core_volt value error: " + gpu_core_volt;
+        spdlog::error(error_msg);
         data_error = true;
+    } else{
+        double gpu_core_volt_value = std::stod(gpu_core_volt);
+        if (gpu_core_volt_value > GPU_VOLTAGE_MAX || gpu_core_volt_value < GPU_VOLTAGE_MIN) {
+            std::string error_msg = "gpu_core_volt value error: " + gpu_core_volt;
+            spdlog::error(error_msg);
+            data_error = true;
+        }   
     }
+
     return fwriter.write(json);
 }
