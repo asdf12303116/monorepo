@@ -1,4 +1,4 @@
-name: create pre-release
+name: create release
 
 on:
   workflow_dispatch:
@@ -54,5 +54,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: change.md
-          prerelease: true
+          prerelease: false
           files: ./*.jar
