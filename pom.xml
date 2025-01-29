@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version>
+        <version>3.4.2</version>
         <relativePath/>
     </parent>
     <groupId>xyz.chen</groupId>
@@ -16,20 +16,21 @@
     <modules>
         <module>library-management-app</module>
     </modules>
+    
 
 
     <properties>
-        <spring-cloud.version>2023.0.2</spring-cloud.version>
-        <postgresql.version>42.7.3</postgresql.version>
-        <oracle.jdbc.version>23.4.0.24.05</oracle.jdbc.version>
-        <mybatis-plus.version>3.5.6</mybatis-plus.version>
-        <hutool.version>5.8.29</hutool.version>
+        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <postgresql.version>42.7.5</postgresql.version>
+        <oracle.jdbc.version>23.6.0.24.10</oracle.jdbc.version>
+        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
+        <hutool.version>5.8.35</hutool.version>
         <jib.version>3.4.0</jib.version>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.0.1</nimbus-jose-jwt.version>
         <java.version>21</java.version>
-        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
-        <springdoc.version>2.6.0</springdoc.version>
+        <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
+        <springdoc.version>2.8.4</springdoc.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -53,11 +54,6 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
@@ -78,7 +74,13 @@
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-bom</artifactId>
+                <version>${mybatis-plus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -97,6 +99,14 @@
                             </ignoreVersion>
                         </ignoreVersions>
                     </ruleSet>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
         </plugins>
