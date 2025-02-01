@@ -34,17 +34,14 @@ jobs:
       - name: Check TAG
         run: echo "ver=${{ steps.get-version.outputs.version }}.${{ steps.commit.outputs.short }}" >> $GITHUB_ENV
 
-      - name: Get tag
-        id: tag
-        uses: devops-actions/action-get-tag@v1.0.3
-        with:
-          strip_v: false
+      - name: Get latest tag
+        run: echo "latest_tag=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
         
       - name: Build JAR
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./library-management-app/target/*.jar ./lma.$(date +%Y-%m-%d).${{steps.tag.outputs.tag}}.${{ steps.commit.outputs.short }}.jar
+        run: mv ./library-management-app/target/*.jar ./lma.$(date +%Y-%m-%d).${{env.latest_tag}}.${{ steps.commit.outputs.short }}.jar
 
       - name: Create changelog text
         id: changelog
