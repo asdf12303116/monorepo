@@ -34,15 +34,17 @@ jobs:
       - name: Check TAG
         run: echo "ver=${{ steps.get-version.outputs.version }}.${{ steps.commit.outputs.short }}" >> $GITHUB_ENV
 
-      - name: Get version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Get tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.3
+        with:
+          strip_v: false
         
       - name: Build JAR
         run: mvn  -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./library-management-app/target/*.jar ./lma.$(date +%Y-%m-%d).${{ steps.get_version.outputs.VERSION }}.${{ steps.commit.outputs.short }}.jar
+        run: mv ./library-management-app/target/*.jar ./lma.$(date +%Y-%m-%d).${{steps.tag.outputs.tag}}.${{ steps.commit.outputs.short }}.jar
 
       - name: Create changelog text
         id: changelog
