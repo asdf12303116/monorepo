@@ -14,13 +14,6 @@ tests/**/coverage/
 
 # Editor directories and files
 .idea
-
-.vscode
-
-target
-
-**/src/main/resources/application-local.yaml
-
 *.suo
 *.ntvs*
 *.njsproj
