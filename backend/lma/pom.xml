@@ -6,7 +6,7 @@
         <groupId>xyz.chen</groupId>
         <artifactId>root</artifactId>
         <version>0.0.1</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>library-management-app</artifactId>
     <version>0.0.1</version>
