@@ -1,0 +1,32 @@
+{
+  "name": "lm-web",
+  "version": "4.5.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite",
+    "serve": "pnpm dev",
+    "build": "rimraf dist && NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "build:staging": "rimraf dist && vite build --mode staging",
+    "report": "rimraf dist && vite build",
+    "preview": "vite preview",
+    "preview:build": "pnpm build && vite preview",
+    "typecheck": "tsc --noEmit && vue-tsc --noEmit --skipLibCheck",
+    "svgo": "svgo -f src/assets/svg -o src/assets/svg",
+    "cloc": "NODE_OPTIONS=--max-old-space-size=4096 cloc . --exclude-dir=node_modules --exclude-lang=YAML",
+    "clean:cache": "rimraf node_modules && rimraf .eslintcache && pnpm install",
+    "lint:eslint": "eslint --cache --max-warnings 0  \"{src,mock,build}/**/*.{vue,js,ts,tsx}\" --fix",
+    "lint:prettier": "prettier --write  \"src/**/*.{js,ts,json,tsx,css,scss,vue,html,md}\"",
+    "lint:stylelint": "stylelint \"**/*.{html,vue,css,scss}\" --fix --cache --cache-location node_modules/.cache/stylelint/",
+    "lint:pretty": "pretty-quick --staged",
+    "lint": "pnpm lint:eslint && pnpm lint:prettier && pnpm lint:stylelint",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "browserslist": [
+    "> 1%",
+    "not ie 11",
+    "not op_mini all"
+  ],
+  "repository": "git@github.com:pure-admin/pure-admin-thin.git",
+  "author": "xiaoxian521",
+  "license": "MIT"
+}

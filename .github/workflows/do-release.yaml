@@ -5,6 +5,12 @@ on:
   push:
     tags:
       - '*'
+
+env:
+  PARENT_PATH: './backend'
+  LMA_PATH: './backend/lma'
+  PARENT_POM: './backend/parent/pom.xml'
+  LMA_POM: './backend/lma/pom.xml'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,28 +23,16 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./library-management-app/pom.xml') }}
-          restore-keys: maven-${{ hashFiles('./pom.xml') }}-${{ hashFiles('./library-management-app/pom.xml') }}
-      - id: get-version
-        uses: jactions/maven-version@v1.2.0
-        with:
-          pom: ./library-management-app/pom.xml
 
       - id: commit
         uses: prompt/actions-commit-hash@v3
 
-      - name: Check TAG
-        run: echo "ver=${{ steps.get-version.outputs.version }}.${{ steps.commit.outputs.short }}" >> $GITHUB_ENV
         
       - name: Build JAR
-        run: mvn  -B clean package -Dmaven.test.skip=true
+        run: mvn -f ${{env.PARENT_POM}} -B clean package -Dmaven.test.skip=true
 
       - name: Rename JAR
-        run: mv ./library-management-app/target/*.jar ./lma.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
+        run: mv  ${{env.LMA_PATH}}/target/*.jar ./lma.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
 
       - name: Create changelog text
         id: changelog
