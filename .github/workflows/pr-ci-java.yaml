@@ -1,4 +1,4 @@
-name: pull request check
+name: pull request check (java)
 
 on:
   workflow_dispatch:
@@ -29,6 +29,3 @@ jobs:
 
       - name: Build JAR
         run: mvn -f ${{env.PARENT_POM}}  -B clean package -Dmaven.test.skip=true
-
-      - name: Rename JAR
-        run: mv ${{env.LMA_PATH}}/target/*.jar ./app.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
