@@ -14,6 +14,9 @@ importers:
       element-plus:
         specifier: 2.9.4
         version: 2.9.4(vue@3.5.13(typescript@5.7.3))
+      nprogress-v2:
+        specifier: ^1.0.4
+        version: 1.0.4
       pinia:
         specifier: ^2.3.1
         version: 2.3.1(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
@@ -1525,6 +1528,9 @@ packages:
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
+
+  nprogress-v2@1.0.4:
+    resolution: {integrity: sha512-HPhTEgqsQMFXXuaftvu6bevqEXvcQ/hogvkAswlcNyS9eRGjvo7wZY1O4H3aZS4Uq8oWSO6sL3dOj6Oq/ZJN5A==}
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
@@ -3366,6 +3372,8 @@ snapshots:
     dependencies:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
+
+  nprogress-v2@1.0.4: {}
 
   nth-check@2.1.1:
     dependencies:
