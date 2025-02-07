@@ -5,7 +5,8 @@
   "workspaces": {
     "packages": [
       "web-apps/*",
-      "!web-apps/lm-web-deprecated"
+      "!backend/*",
+      "!deprecated/*"
     ]
   },
   "scripts": {
