@@ -42,10 +42,10 @@ jobs:
     - name: Configure CMake
       working-directory: ./app/esp32_host_app
       run: |
-        cmake -B build -S . \
-          -G "Ninja" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE=../../vcpkg/scripts/buildsystems/vcpkg.cmake \
+        cmake -B build -S . `
+          -G "Ninja" `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_TOOLCHAIN_FILE=../../vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=x64-windows
 
     - name: Build project
