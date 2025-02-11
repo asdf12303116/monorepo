@@ -1,0 +1,53 @@
+name: pull request check (esp32-host-cpp)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ opened, reopened ]
+    paths:
+      - 'app/**'
+      - '.github/workflows/pr-ci-cpp.yaml'
+
+
+jobs:
+  build:
+    name: Build with MSVC
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install build tools
+      run: |
+        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+        choco install ninja
+
+    - name: Setup vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat -disableMetrics
+        ./vcpkg integrate install
+
+    - name: Install dependencies
+      working-directory: ./app/esp32_host_app
+      run: ../../vcpkg/vcpkg install --triplet=x64-windows
+
+    - name: Configure CMake
+      working-directory: ./app/esp32_host_app
+      run: |
+        cmake -B build -S . `
+          -G "Ninja" `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_TOOLCHAIN_FILE="../../vcpkg/scripts/buildsystems/vcpkg.cmake" `
+          -DVCPKG_TARGET_TRIPLET=x64-windows
+
+    - name: Build project
+      working-directory: ./app/esp32_host_app
+      run: cmake --build build --config Release
