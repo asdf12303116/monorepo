@@ -12,7 +12,7 @@ env:
   PARENT_POM: './backend/parent/pom.xml'
   LMA_POM: './backend/lma/pom.xml'
 jobs:
-  build:
+  build-java:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.output.outputs.ver }}
@@ -34,6 +34,155 @@ jobs:
       - name: Rename JAR
         run: mv  ${{env.LMA_PATH}}/target/*.jar ./lma.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.jar
 
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lma
+          path: ./*.jar
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          ache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: 'zip files'
+        working-directory: ./web-apps/template
+        run: zip -r template.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.zip ./dist/
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: template
+          path: ./web-apps/template/*.zip
+
+  build-cpp:
+    runs-on: windows-latest
+    env:
+      BASE_DIR: '${{ github.workspace }}'
+      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
+
+      - uses: lukka/get-cmake@latest
+
+      - uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11
+
+      - name: update
+        run: |
+          git fetch vcpkg --unshallow
+          cd vcpkg
+          git fetch --unshallow
+
+      - name: Configure CMake
+        run: |
+          cd app/esp32_host_app
+          cmake -B build -S . `
+            -G "Ninja" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_TOOLCHAIN_FILE="${{ env.BASE_DIR }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Build project
+        working-directory: app/esp32_host_app
+        run: cmake --build build --config Release
+
+
+      - name: 'zip files'
+        working-directory: app/esp32_host_app/build
+        shell: bash
+        run: |
+          cp esp32_host_newapp.exe esp32_host_app.exe
+          mkdir artifact
+          cp esp32_host_app.exe artifact/
+          cp config.ini artifact/
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-host
+          path: ./app/esp32_host_app/build/artifact/*
+
+  build-mcu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build PlatformIO
+        working-directory: ./mcu/esp32-monitor
+        run: pio run -e esp32dev
+
+      - name: 'rename files'
+        run: cp ./mcu/esp32-monitor/.pio/build/esp32dev/firmware.elf ./firmware.$(date +%Y-%m-%d).${{ steps.commit.outputs.short }}.elf
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-monitor
+          path: ./*.elf
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build-java
+      - build-web
+      - build-cpp
+      - build-mcu
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: collect all artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+
       - name: Create changelog text
         id: changelog
         uses: loopwerk/tag-changelog@v1
@@ -44,9 +193,10 @@ jobs:
       - name: Check CHANGELOG
         run: echo "${{ steps.changelog.outputs.changes }}" >> change.md
 
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           body_path: change.md
           prerelease: false
-          files: ./*.jar
+          files: ./artifacts/*.*
