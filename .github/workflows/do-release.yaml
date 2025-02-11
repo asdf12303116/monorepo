@@ -187,6 +187,8 @@ jobs:
         run: |
           cd artifacts
           zip  esp32-host-app.$(ls | grep "jar" | awk -F '.' '{ print $2"."$3}').zip ./esp32_host_app.exe ./config.ini
+          rm esp32_host_app.exe 
+          rm config.ini
 
       - name: Create changelog text
         id: changelog
