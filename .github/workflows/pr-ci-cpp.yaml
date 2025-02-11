@@ -7,9 +7,7 @@ on:
     paths:
       - 'app/**'
       - '.github/workflows/pr-ci-cpp.yaml'
-env:
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-  VCPKG_INSTALLATION_ROOT: ${{ github.workspace }}/vcpkg/installed
+
 
 jobs:
   build:
@@ -39,7 +37,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./app/esp32_host_app
-      run: ${{ env.VCPKG_ROOT }}/vcpkg install --triplet=x64-windows
+      run: ../../vcpkg/vcpkg install --triplet=x64-windows
 
     - name: Configure CMake
       working-directory: ./app/esp32_host_app
@@ -47,7 +45,7 @@ jobs:
         cmake -B build -S . \
           -G "Ninja" \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=../../vcpkg/scripts/buildsystems/vcpkg.cmake \
           -DVCPKG_TARGET_TRIPLET=x64-windows
 
     - name: Build project
