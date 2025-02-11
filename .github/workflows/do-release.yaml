@@ -183,6 +183,11 @@ jobs:
           path: ./artifacts
           merge-multiple: true
 
+      - name: rename file
+        run: |
+          cd artifacts
+          zip  esp32-host-app.$(ls | grep "jar" | awk -F '.' '{ print $2"."$3}').zip ./esp32_host_app.exe ./config.ini
+
       - name: Create changelog text
         id: changelog
         uses: loopwerk/tag-changelog@v1
