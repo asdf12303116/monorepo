@@ -17,7 +17,7 @@
   "private": true,
   "dependencies": {
     "axios": "^1.7.9",
-    "element-plus": "2.9.4",
+    "element-plus": "2.9.5",
     "nprogress-v2": "^1.1.10",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
