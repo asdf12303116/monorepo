@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useRouteStore } from '@/stores/index.ts'
 import HomeView from '../views/HomeView.vue'
 import  NProgress  from '@/utils/progress/index.ts'
+import { callback_uri, checkSso, } from './sso.ts'
 
 const staticRoutes = [
   {
@@ -30,7 +31,9 @@ router.beforeEach((to, from, next) => {
   const store = useRouteStore()
   // 获取pinia中储存的路由数据（1、固定值 2、从登录接口中获取储存的）
   // 若是使用vuex,取值方法类似
-
+  if (to.path.match(callback_uri)) {
+    checkSso(to.query as ssoInfo)
+  }
   const list = router.getRoutes()
   // 获取当前路由中routes信息，和routes长度对比，若是长度相等，则需要加载动态的路由
   // if (list.length == staticRoutes.length) {
