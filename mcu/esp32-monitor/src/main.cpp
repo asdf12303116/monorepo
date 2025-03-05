@@ -58,11 +58,12 @@ void setup() {
     
     ui_init();
     data_timeout_set();
+    
+    setupWiFi();
+    init_server();
     ticker_wifi.attach(60, checkWiFi);
     ticker_lcd.attach(DATA_TIMEOUT_SEC / 2, check_data_timeout);
 
-    setupWiFi();
-    init_server();
     
 }
 

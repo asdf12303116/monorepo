@@ -13,6 +13,8 @@
 struct sensor_data {
   int fps;
   int cpu_freq;
+  int e_core_freq;
+  int p_core_freq;
   int cpu_avg_usage;
   int cpu_tdp;
   int cpu_temp;
