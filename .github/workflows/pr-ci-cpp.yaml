@@ -3,7 +3,7 @@ name: pull request check (esp32-host-cpp)
 on:
   workflow_dispatch:
   pull_request:
-    types: [ opened, reopened ]
+    types: [ opened, reopened]
     paths:
       - 'app/**'
       - '.github/workflows/pr-ci-cpp.yaml'
@@ -13,41 +13,45 @@ jobs:
   build:
     name: Build with MSVC
     runs-on: windows-latest
-
+    env:
+      BASE_DIR: '${{ github.workspace }}'
+      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Setup MSVC environment
-      uses: ilammy/msvc-dev-cmd@v1
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
 
-    - name: Install build tools
-      run: |
-        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install ninja
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
 
-    - name: Setup vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.bat -disableMetrics
-        ./vcpkg integrate install
+      - uses: lukka/get-cmake@latest
 
-    - name: Install dependencies
-      working-directory: ./app/esp32_host_app
-      run: ../../vcpkg/vcpkg install --triplet=x64-windows
+      - uses: seanmiddleditch/gha-setup-ninja@master
 
-    - name: Configure CMake
-      working-directory: ./app/esp32_host_app
-      run: |
-        cmake -B build -S . `
-          -G "Ninja" `
-          -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_TOOLCHAIN_FILE="../../vcpkg/scripts/buildsystems/vcpkg.cmake" `
-          -DVCPKG_TARGET_TRIPLET=x64-windows
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11
 
-    - name: Build project
-      working-directory: ./app/esp32_host_app
-      run: cmake --build build --config Release
+      - name: update
+        run: |
+          git fetch vcpkg --unshallow
+          cd vcpkg
+          git fetch --unshallow
+
+      - name: Configure CMake
+        run: |
+          cd app/esp32_host_app
+          cmake -B build -S . `
+            -G "Ninja" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_TOOLCHAIN_FILE="${{ env.BASE_DIR }}\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Build project
+        working-directory: app/esp32_host_app
+        run: cmake --build build --config Release
+
