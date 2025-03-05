@@ -46,10 +46,15 @@ int get_sensor_reading_data(const SENSOR_ADDR_VECTOR & sensor_addr_list, SENSOR_
     int* core_info = cores();
     const int physical_cpu_count = core_info[0];
     const int logical_cpu_count = core_info[1];
+
+    int p_core_count = logical_cpu_count - physical_cpu_count;
+    int e_core_count = physical_cpu_count - p_core_count;
     spdlog::info("Loading sensor addr data...");
     // spdlog::info("current cpu cores: {}({})", physical_cpu_count, logical_cpu_count);
     sensor_dto_reading_vector.logical_cpu_count = logical_cpu_count;
     sensor_dto_reading_vector.physical_cpu_count = physical_cpu_count;
+    sensor_dto_reading_vector.p_core_count = p_core_count;
+    sensor_dto_reading_vector.e_core_count = e_core_count;
 
     // 清空原始数据
     sensor_dto_addr_vector.other_addr_vector.clear();
@@ -62,9 +67,9 @@ int get_sensor_reading_data(const SENSOR_ADDR_VECTOR & sensor_addr_list, SENSOR_
         std::string name = "cpu" + std::to_string(i)+ "_freq";
         sensor_dto_addr_vector.cpu_freq_addr_vector.push_back({ name, CPU_BASE_SENSOR_ID, CPU_BASE_FREQ_READING_ID + i,0x0});
     }
-    for (int i = 0; i < logical_cpu_count; i++) {
+    for (int i = 0; i < physical_cpu_count; i++) {
         std::string name = "cpu" + std::to_string(i)+ "_usage_rate";
-        sensor_dto_addr_vector.cpu_usage_addr_vector.push_back({name, CPU_BASE_SENSOR_ID, CPU_BASE_USAGE_READING_ID + i,0x0});
+        sensor_dto_addr_vector.cpu_usage_addr_vector.push_back({name, CPU_BASE_SENSOR_ID, CPU_BASE_USAGE_READING_ID + 2*i,0x0});
     }
     // 获取其他Sensor地址
     for (const auto& addr : sensor_addr_list) {
@@ -124,6 +129,8 @@ std::string reading_sensor(const SENSOR_DTO_READING_VECTOR & sensor_dto_reading_
     Json::Value cpu_usage_show_data(Json::objectValue);
     int physical_cpu_count = sensor_dto_reading_vector.physical_cpu_count;
     int logical_cpu_count = sensor_dto_reading_vector.logical_cpu_count;
+    int p_core_count = sensor_dto_reading_vector.p_core_count;
+    int e_core_count = sensor_dto_reading_vector.e_core_count;
     
     for (const auto& data : sensor_dto_reading_vector.other_addr_vector) {
         if (data.name == "gpu_core_volt") {
@@ -141,7 +148,29 @@ std::string reading_sensor(const SENSOR_DTO_READING_VECTOR & sensor_dto_reading_
     }
 
     double cpu_freq = total_cpu_freq/physical_cpu_count;
+    double cpu_total_usage = 0;
+    double e_core_freq = 0;
+    double p_core_freq = 0;
 
+    if(p_core_count > 0) {
+        double total_p_core_freq = 0;
+        for (int i = 0; i < p_core_count; i++) {
+            total_p_core_freq += sensor_dto_reading_vector.cpu_freq_addr_vector[i].sensorReadingElement->Value;
+            cpu_total_usage += sensor_dto_reading_vector.cpu_usage_addr_vector[i].sensorReadingElement->Value;
+        }
+        p_core_freq = total_p_core_freq/p_core_count;
+    }
+    if(e_core_count > 0) {
+        double total_e_core_freq = 0;
+        for (int i = p_core_count; i < physical_cpu_count; i++) {
+            total_e_core_freq += sensor_dto_reading_vector.cpu_freq_addr_vector[i].sensorReadingElement->Value;
+            cpu_total_usage += sensor_dto_reading_vector.cpu_usage_addr_vector[i].sensorReadingElement->Value;
+        }
+        e_core_freq = total_e_core_freq/e_core_count;
+    }
+    double cpu_avg_usage = cpu_total_usage/physical_cpu_count;
+    show_data["p_core_freq"] = p_core_freq;
+    show_data["e_core_freq"] = e_core_freq;
     show_data["cpu_freq"] = cpu_freq;
     for (const auto& data : sensor_dto_reading_vector.cpu_usage_addr_vector) {
         cpu_usage_show_data[data.name] = std::to_string(data.sensorReadingElement->Value);
@@ -159,8 +188,11 @@ std::string reading_sensor(const SENSOR_DTO_READING_VECTOR & sensor_dto_reading_
     
     json["logical_cpu_count"] = logical_cpu_count;
     json["physical_cpu_count"] = physical_cpu_count;
+    json["p_core_count"] = p_core_count;
+    json["e_core_count"] = e_core_count;
     json["cpu_freq_data"] = cpu_freq_show_data;
     json["cpu_usage_data"] = cpu_usage_show_data;
+    show_data["cpu_avg_usage"] = cpu_avg_usage;
     json["data"] = show_data;
 
     // 检查数据
