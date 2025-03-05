@@ -175,10 +175,41 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_gpu_name2, -342);
     lv_obj_set_y(ui_gpu_name2, 5);
     lv_obj_set_align(ui_gpu_name2, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_gpu_name2, "Core I5 12400");
+    lv_label_set_text(ui_gpu_name2, "Core I5 13600K");
     lv_obj_set_style_text_color(ui_gpu_name2, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_gpu_name2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_gpu_name2, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_total_mem3 = lv_obj_create(ui_Container9);
+    lv_obj_remove_style_all(ui_total_mem3);
+    lv_obj_set_width(ui_total_mem3, 95);
+    lv_obj_set_height(ui_total_mem3, 50);
+    lv_obj_set_x(ui_total_mem3, -69);
+    lv_obj_set_y(ui_total_mem3, 72);
+    lv_obj_set_align(ui_total_mem3, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_total_mem3, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_total_mem3, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_total_mem3, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_used_cpu_num = lv_label_create(ui_total_mem3);
+    lv_obj_set_width(ui_used_cpu_num, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_used_cpu_num, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_used_cpu_num, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_used_cpu_num, "100");
+    lv_obj_set_style_text_color(ui_used_cpu_num, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_used_cpu_num, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_used_cpu_num, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mem_mb4 = lv_label_create(ui_total_mem3);
+    lv_obj_set_width(ui_mem_mb4, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mem_mb4, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_mem_mb4, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_mem_mb4, "% ");
+    lv_obj_set_style_text_color(ui_mem_mb4, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mem_mb4, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mem_mb4, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_mem_mb4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_mem_mb4, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_core_temp_info = lv_obj_create(ui_Container9);
     lv_obj_remove_style_all(ui_core_temp_info);
@@ -256,67 +287,67 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_bg_color(ui_walt2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_walt2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_total_mem3 = lv_obj_create(ui_Container8);
-    lv_obj_remove_style_all(ui_total_mem3);
-    lv_obj_set_width(ui_total_mem3, 95);
-    lv_obj_set_height(ui_total_mem3, 50);
-    lv_obj_set_x(ui_total_mem3, -69);
-    lv_obj_set_y(ui_total_mem3, 72);
-    lv_obj_set_align(ui_total_mem3, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_total_mem3, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_total_mem3, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_total_mem3, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_e_core_freq_group = lv_obj_create(ui_Container8);
+    lv_obj_remove_style_all(ui_e_core_freq_group);
+    lv_obj_set_width(ui_e_core_freq_group, 155);
+    lv_obj_set_height(ui_e_core_freq_group, 50);
+    lv_obj_set_x(ui_e_core_freq_group, -69);
+    lv_obj_set_y(ui_e_core_freq_group, 72);
+    lv_obj_set_align(ui_e_core_freq_group, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_e_core_freq_group, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_e_core_freq_group, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_e_core_freq_group, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_used_cpu_num = lv_label_create(ui_total_mem3);
-    lv_obj_set_width(ui_used_cpu_num, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_used_cpu_num, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_used_cpu_num, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_used_cpu_num, "100");
-    lv_obj_set_style_text_color(ui_used_cpu_num, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_used_cpu_num, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_used_cpu_num, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_e_core_freq = lv_label_create(ui_e_core_freq_group);
+    lv_obj_set_width(ui_e_core_freq, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_e_core_freq, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_e_core_freq, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_e_core_freq, "2222");
+    lv_obj_set_style_text_color(ui_e_core_freq, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_e_core_freq, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_e_core_freq, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_mem_mb4 = lv_label_create(ui_total_mem3);
-    lv_obj_set_width(ui_mem_mb4, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_mem_mb4, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_mem_mb4, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_mem_mb4, "% ");
-    lv_obj_set_style_text_color(ui_mem_mb4, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_mem_mb4, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_mem_mb4, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_mem_mb4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_mem_mb4, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_e_core_mhz = lv_label_create(ui_e_core_freq_group);
+    lv_obj_set_width(ui_e_core_mhz, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_e_core_mhz, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_e_core_mhz, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_e_core_mhz, "MHz");
+    lv_obj_set_style_text_color(ui_e_core_mhz, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_e_core_mhz, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_e_core_mhz, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_e_core_mhz, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_e_core_mhz, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_gpu_freq_info2 = lv_obj_create(ui_Container8);
-    lv_obj_remove_style_all(ui_gpu_freq_info2);
-    lv_obj_set_width(ui_gpu_freq_info2, 155);
-    lv_obj_set_height(ui_gpu_freq_info2, 50);
-    lv_obj_set_x(ui_gpu_freq_info2, -69);
-    lv_obj_set_y(ui_gpu_freq_info2, 72);
-    lv_obj_set_align(ui_gpu_freq_info2, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_gpu_freq_info2, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_gpu_freq_info2, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_gpu_freq_info2, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_p_core_freq_group = lv_obj_create(ui_Container8);
+    lv_obj_remove_style_all(ui_p_core_freq_group);
+    lv_obj_set_width(ui_p_core_freq_group, 155);
+    lv_obj_set_height(ui_p_core_freq_group, 50);
+    lv_obj_set_x(ui_p_core_freq_group, -69);
+    lv_obj_set_y(ui_p_core_freq_group, 72);
+    lv_obj_set_align(ui_p_core_freq_group, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_p_core_freq_group, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_p_core_freq_group, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_p_core_freq_group, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_cpu_freq = lv_label_create(ui_gpu_freq_info2);
-    lv_obj_set_width(ui_cpu_freq, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_cpu_freq, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_cpu_freq, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_cpu_freq, "2222");
-    lv_obj_set_style_text_color(ui_cpu_freq, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_cpu_freq, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_cpu_freq, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_p_core_freq = lv_label_create(ui_p_core_freq_group);
+    lv_obj_set_width(ui_p_core_freq, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_p_core_freq, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_p_core_freq, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_p_core_freq, "2222");
+    lv_obj_set_style_text_color(ui_p_core_freq, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_p_core_freq, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_p_core_freq, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Mhz3 = lv_label_create(ui_gpu_freq_info2);
-    lv_obj_set_width(ui_Mhz3, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Mhz3, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Mhz3, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Mhz3, "MHz");
-    lv_obj_set_style_text_color(ui_Mhz3, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Mhz3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Mhz3, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_Mhz3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Mhz3, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_p_core_mhz = lv_label_create(ui_p_core_freq_group);
+    lv_obj_set_width(ui_p_core_mhz, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_p_core_mhz, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_p_core_mhz, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_p_core_mhz, "MHz");
+    lv_obj_set_style_text_color(ui_p_core_mhz, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_p_core_mhz, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_p_core_mhz, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_p_core_mhz, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_p_core_mhz, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Container6 = lv_obj_create(ui_cpu_info);
     lv_obj_remove_style_all(ui_Container6);
@@ -1027,14 +1058,16 @@ void ui_Screen1_screen_init(void)
     uic_fps = ui_fps;
     uic_cpu_info = ui_cpu_info;
     uic_gpu_name = ui_gpu_name2;
+    uic_used_cpu_num = ui_used_cpu_num;
     uic_core_temp_info = ui_core_temp_info;
     uic_cpu_core_temp = ui_cpu_core_temp;
     uic_gpu_mem_mb = ui_gpu_mem_mb3;
     uic_gpu_power = ui_gpu_power2;
     uic_used_cpu_power = ui_used_cpu_power;
-    uic_used_cpu_num = ui_used_cpu_num;
-    uic_gpu_freq_info = ui_gpu_freq_info2;
-    uic_Mhz = ui_Mhz3;
+    uic_gpu_freq_info = ui_e_core_freq_group;
+    uic_Mhz = ui_e_core_mhz;
+    uic_gpu_freq_info = ui_p_core_freq_group;
+    uic_Mhz = ui_p_core_mhz;
     uic_mem_info = ui_mem_info;
     uic_used_mem_number = ui_used_mem_number;
     uic_used_mem = ui_used_mem;

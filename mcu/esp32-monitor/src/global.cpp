@@ -15,6 +15,9 @@ bool cpu_number_update = false;
 int logical_cpu_count = 0;
 int physical_cpu_count = 0;
 
+int e_core_count = 0;
+int p_core_count = 0;
+
 int DATA_TIMEOUT_SEC = 120;
 bool data_received = false;
 int last_data_received_time = 0;

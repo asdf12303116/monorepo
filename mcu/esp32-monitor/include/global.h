@@ -22,6 +22,9 @@ extern bool cpu_number_update;
 extern int logical_cpu_count;
 extern int physical_cpu_count;
 
+extern int e_core_count;
+extern int p_core_count;
+
 extern int DATA_TIMEOUT_SEC;
 extern bool data_received;
 extern int last_data_received_time;

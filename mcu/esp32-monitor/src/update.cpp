@@ -10,7 +10,7 @@ void change_cpu_number_bar() {
         // Serial.printf("cpu number bar is: %d\n",cpu_nar_total_number);
 
         for (int i = cpu_nar_total_number - 1  ; i > 0; --i) {
-            if (i >= logical_cpu_count) {
+            if (i >= physical_cpu_count) {
                 lv_obj_add_flag(lv_obj_get_child(ui_Container6, i), LV_OBJ_FLAG_HIDDEN);
             }
         }
@@ -24,7 +24,7 @@ void update_show_data() {
     if (sensor_data_updated) {
         change_cpu_number_bar();
             // Serial.print("cpu number bar update:");
-            for (int i = 0; i < logical_cpu_count; i++) {
+            for (int i = 0; i < physical_cpu_count; i++) {
                 // Serial.printf(" %d:%d",i,cpu_usage_data.get(i));
                 lv_bar_set_value(lv_obj_get_child(ui_Container6, i), cpu_usage_data.get(i), LV_ANIM_OFF);
             }
@@ -40,7 +40,16 @@ void update_show_data() {
         lv_label_set_text_fmt(ui_cpu_core_temp, "%d", sensor_data_point->cpu_temp);
         lv_label_set_text_fmt(ui_used_cpu_power, "%d", sensor_data_point->cpu_tdp);
         lv_label_set_text_fmt(ui_used_cpu_num, "%d", sensor_data_point->cpu_avg_usage);
-        lv_label_set_text_fmt(ui_cpu_freq, "%d", sensor_data_point->cpu_freq);
+        lv_label_set_text_fmt(ui_p_core_freq, "%d", sensor_data_point->p_core_freq);
+
+//        Serial.printf("core count: p core: %d  e core: %d \n", p_core_count, e_core_count);
+        if (e_core_count > 0) {
+            lv_obj_clear_flag(ui_e_core_freq_group, LV_OBJ_FLAG_HIDDEN);
+            lv_label_set_text_fmt(ui_e_core_freq, "%d", sensor_data_point->e_core_freq);
+        } else {
+            lv_obj_add_flag(ui_e_core_freq_group, LV_OBJ_FLAG_HIDDEN);
+        }
+        
 
         lv_label_set_text_fmt(ui_used_mem_number, "%d", sensor_data_point->mem_usage_number);
         lv_label_set_text_fmt(ui_used_mem, "%d", sensor_data_point->mem_usage_rate);
@@ -97,13 +106,16 @@ void update_data(JsonDocument data, enum UPDATE_TYPE type) {
 
     logical_cpu_count = data["logical_cpu_count"];
     physical_cpu_count = data["physical_cpu_count"];
+    
+    e_core_count = data["e_core_count"];
+    p_core_count = data["p_core_count"];
 
-    //physical_cpu freq
 
-    //logical_cpu usage
 
-    for (int i = 0; i < logical_cpu_count; i++) {
-        if (cpu_usage_data.size() == logical_cpu_count) {
+    //cpu usage
+
+    for (int i = 0; i < physical_cpu_count; i++) {
+        if (cpu_usage_data.size() == physical_cpu_count) {
             cpu_usage_data[i] = data["cpu_usage_data"]["cpu"+String(i)+"_usage_rate"];
         } else {
             cpu_usage_data.add(data["cpu_usage_data"]["cpu"+String(i)+"_usage_rate"]);
@@ -114,8 +126,10 @@ void update_data(JsonDocument data, enum UPDATE_TYPE type) {
 
     // basic data
     sensor_data_point->fps =  data["data"]["fps"];
-    sensor_data_point->cpu_avg_usage =  data["cpu_avg_usage"];
+//    sensor_data_point->cpu_avg_usage =  data["cpu_avg_usage"];
     sensor_data_point->cpu_freq = data["data"]["cpu_freq"];
+    sensor_data_point->p_core_freq = data["data"]["p_core_freq"];
+    sensor_data_point->e_core_freq = data["data"]["e_core_freq"];
     sensor_data_point->cpu_avg_usage = data["data"]["cpu_avg_usage"];
     sensor_data_point->cpu_tdp = data["data"]["cpu_tdp"];
     sensor_data_point->cpu_temp = data["data"]["cpu_temp"];
