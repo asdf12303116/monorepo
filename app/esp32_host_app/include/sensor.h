@@ -46,6 +46,8 @@ struct SENSOR_DTO_READING_VECTOR {
     int size = 0;
     int physical_cpu_count = 0;
     int logical_cpu_count= 0;
+    int p_core_count = 0;
+    int e_core_count = 0;
 };
 
 struct BASIC_SHOW_DATA {
