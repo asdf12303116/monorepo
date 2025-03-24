@@ -20,7 +20,7 @@
 
 
     <properties>
-        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
         <postgresql.version>42.7.5</postgresql.version>
         <oracle.jdbc.version>23.7.0.25.01</oracle.jdbc.version>
         <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
