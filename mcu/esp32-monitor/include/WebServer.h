@@ -26,7 +26,7 @@ struct sensor_data {
   int gpu_mem_usage_rate;
   int gpu_tdp;
   int gpu_temp;
-  int mem_usage_number;
+  float mem_usage_number;
   int mem_usage_rate;
   bool gpu_limit_power;
   bool gpu_limit_heat;

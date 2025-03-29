@@ -611,7 +611,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_mem_mb, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_mem_mb, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_mem_mb, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_mem_mb, " MB");
+    lv_label_set_text(ui_mem_mb, " GB");
     lv_obj_set_style_text_color(ui_mem_mb, lv_color_hex(0xFF8000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_mem_mb, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_mem_mb, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -806,7 +806,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_gpu_core_volt, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_gpu_core_volt, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_gpu_core_volt, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_gpu_core_volt, "2333");
+    lv_label_set_text(ui_gpu_core_volt, "-");
     lv_obj_set_style_text_color(ui_gpu_core_volt, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_gpu_core_volt, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_gpu_core_volt, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);

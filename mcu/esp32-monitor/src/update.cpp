@@ -51,7 +51,8 @@ void update_show_data() {
         }
         
 
-        lv_label_set_text_fmt(ui_used_mem_number, "%d", sensor_data_point->mem_usage_number);
+        lv_label_set_text_fmt(ui_used_mem_number, "%.2f", sensor_data_point->mem_usage_number);
+        lv_obj_set_align(ui_used_mem_number, LV_TEXT_ALIGN_RIGHT);
         lv_label_set_text_fmt(ui_used_mem, "%d", sensor_data_point->mem_usage_rate);
         lv_bar_set_value(ui_used_mem_bar, sensor_data_point->mem_usage_rate, LV_ANIM_OFF);
 
@@ -59,7 +60,8 @@ void update_show_data() {
         lv_label_set_text_fmt(ui_gpu_core_temp, "%d", sensor_data_point->gpu_temp);
         lv_label_set_text_fmt(ui_uesd_gpu_power, "%d", sensor_data_point->gpu_tdp);
         lv_label_set_text_fmt(ui_gpu_freq, "%d", sensor_data_point->gpu_core_freq);
-        lv_label_set_text_fmt(ui_gpu_core_volt, "%d", sensor_data_point->gpu_core_volt);
+        // 暂时屏蔽
+//        lv_label_set_text_fmt(ui_gpu_core_volt, "%d", sensor_data_point->gpu_core_volt);
         lv_label_set_text_fmt(ui_gpu_core_load, "%d", sensor_data_point->gpu_core_usage_number);
         lv_label_set_text_fmt(ui_gpu_mem_freq, "%d", sensor_data_point->gpu_mem_freq);
         lv_label_set_text_fmt(ui_used_gpu_mem, "%d", sensor_data_point->gpu_mem_usage_number);
