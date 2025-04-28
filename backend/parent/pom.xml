@@ -23,7 +23,7 @@
         <spring-cloud.version>2024.0.1</spring-cloud.version>
         <postgresql.version>42.7.5</postgresql.version>
         <oracle.jdbc.version>23.7.0.25.01</oracle.jdbc.version>
-        <mybatis-plus.version>3.5.11</mybatis-plus.version>
+        <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <hutool.version>5.8.36</hutool.version>
         <jib.version>3.4.0</jib.version>
         <servlet-api.version>6.1.0</servlet-api.version>
