@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   server: {
+    allowedHosts: ['local_web_dev.lizhi.fun','localhost'],
     proxy: {
       "/api": {
         // 这里填写后端地址
