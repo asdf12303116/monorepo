@@ -58,6 +58,8 @@ config:
   permit-all-urls:
     - /login
     - /login/oauth2Callback
+    - /login/oauth2CallbackPost
+    - /login/logout
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

@@ -2,6 +2,8 @@ package xyz.chen.member.controller;
 
 
 import cn.hutool.core.collection.CollUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -22,11 +24,14 @@ import xyz.chen.commons.base.UserInfo;
 import xyz.chen.commons.utils.JwtUtils;
 import xyz.chen.member.entity.AuthUser;
 import xyz.chen.member.entity.LoginData;
+import xyz.chen.member.entity.dto.SsoInfo;
 import xyz.chen.member.services.AuthService;
 import xyz.chen.member.services.OAuthService;
 import xyz.chen.member.services.UserService;
 import xyz.chen.member.utils.UserUtils;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 
@@ -117,6 +122,12 @@ public class LoginController {
 
 
     }
+    
+    @PostMapping("/login/oauth2CallbackPost")
+    public BaseResponse<Object> getCodePost(@RequestBody SsoInfo ssoInfo){
+        log.info("sso info :{}",ssoInfo);
+        return getCode(ssoInfo.code(),ssoInfo.state());
+    }
 
     @GetMapping("/refreshToken")
     public BaseResponse<Object> flushToken() {
@@ -124,6 +135,16 @@ public class LoginController {
         AuthUser authUser = (AuthUser) authService.loadUserByUsername(userInfo.userName());
         String token = JwtUtils.generateSignedJwt(authUser.getUsername(), authUser.getId(), authUser.getRoles());
         return BaseResponse.ok(token);
+    }
+
+    @RequestMapping("/login/logout")
+    public void signOut(HttpServletRequest httpRequest, HttpServletResponse response) throws IOException {
+        
+        String endSessionEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/logout";
+
+        String redirectUrl = "http://localhost:8080/msal4jsample/";
+        response.sendRedirect(endSessionEndpoint + "?post_logout_redirect_uri=" +
+                URLEncoder.encode(redirectUrl, "UTF-8"));
     }
 
 
