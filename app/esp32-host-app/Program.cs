@@ -33,10 +33,12 @@ var monitor = new Monitor(computer, updateVisitor);
 monitor.Init(out var sensors);
 
 
-var options = new RestClientOptions("http://192.168.30.247:9780") {
-    Timeout = TimeSpan.FromSeconds(10)
-};
-var client = new RestClient(options);
+// var options = new RestClientOptions("http://192.168.30.247:9780") {
+//     Timeout = TimeSpan.FromSeconds(10)
+// };
+// var client = new RestClient(options);
+
+var mqttClient = new MqttSend();
 
 
 while (true)
@@ -46,7 +48,8 @@ while (true)
     
     var data =  DataFormat.GetJsonInfo(coreCount, sensors);
 
-    HttpSend.send(client, data);
+    // HttpSend.send(client, data);
+    mqttClient.SendAsync(data);
     
     
     // Task.WaitAll(sendTask);
