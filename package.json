@@ -17,7 +17,7 @@
   "private": true,
   "dependencies": {
     "@types/js-cookie": "^3.0.6",
-    "axios": "^1.8.4",
+    "axios": "^1.12.2",
     "element-plus": "2.9.11",
     "js-cookie": "^3.0.5",
     "nprogress-v2": "^1.1.10",
