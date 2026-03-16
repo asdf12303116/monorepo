@@ -9,6 +9,7 @@
 #include <global.h>
 #include <Config.h>
 #include <update.h>
+#include "mqtt.h"
 
 Ticker ticker_lcd;
 Ticker ticker_wifi;
@@ -46,7 +47,8 @@ void checkWiFi(){
         WiFi.begin(config->ssid, config->password);
     }
     if (WiFi.status() == WL_CONNECTED) {
-        init_server();
+//        init_server();
+        init_mqtt();
     }
 }
 
@@ -60,7 +62,8 @@ void setup() {
     data_timeout_set();
     
     setupWiFi();
-    init_server();
+    init_mqtt();
+//    init_server();
     ticker_wifi.attach(60, checkWiFi);
     ticker_lcd.attach(DATA_TIMEOUT_SEC / 2, check_data_timeout);
 
