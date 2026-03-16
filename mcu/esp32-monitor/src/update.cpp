@@ -61,7 +61,7 @@ void update_show_data() {
         lv_label_set_text_fmt(ui_uesd_gpu_power, "%d", sensor_data_point->gpu_tdp);
         lv_label_set_text_fmt(ui_gpu_freq, "%d", sensor_data_point->gpu_core_freq);
         // 暂时屏蔽
-//        lv_label_set_text_fmt(ui_gpu_core_volt, "%d", sensor_data_point->gpu_core_volt);
+       lv_label_set_text_fmt(ui_gpu_core_volt, "%d", sensor_data_point->gpu_core_volt);
         lv_label_set_text_fmt(ui_gpu_core_load, "%d", sensor_data_point->gpu_core_usage_number);
         lv_label_set_text_fmt(ui_gpu_mem_freq, "%d", sensor_data_point->gpu_mem_freq);
         lv_label_set_text_fmt(ui_used_gpu_mem, "%d", sensor_data_point->gpu_mem_usage_number);
