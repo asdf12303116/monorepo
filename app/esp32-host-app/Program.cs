@@ -31,6 +31,14 @@ var computer = new Computer
 var monitor = new Monitor(computer, updateVisitor);
 
 monitor.Init(out var sensors);
+using var fpsCollector = new PresentMonFpsCollector();
+var isRunning = true;
+
+Console.CancelKeyPress += (_, eventArgs) =>
+{
+    eventArgs.Cancel = true;
+    isRunning = false;
+};
 
 
 // var options = new RestClientOptions("http://192.168.30.247:9780") {
@@ -41,18 +49,21 @@ monitor.Init(out var sensors);
 var mqttClient = new MqttSend();
 
 
-while (true)
+while (isRunning)
 {
     //更新传感器
     updateVisitor.VisitComputer(computer);
-    
-    var data =  DataFormat.GetJsonInfo(coreCount, sensors);
+    var fpsSnapshot = fpsCollector.GetSnapshot();
+    // Console.WriteLine($"当前pid: {fpsSnapshot.ProcessId},当前fps: {fpsSnapshot.Value}");
+    var data = DataFormat.GetJsonInfo(coreCount, sensors, fpsSnapshot.Value);
 
     // HttpSend.send(client, data);
-    mqttClient.SendAsync(data);
+    _ = mqttClient.SendAsync(data);
     
     
     // Task.WaitAll(sendTask);
     
     Thread.Sleep(1000);
 }
+
+computer.Close();

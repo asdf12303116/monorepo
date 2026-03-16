@@ -55,6 +55,7 @@ public struct GpuSensor
     public ISensor GpuPower;
     public ISensor GpuClock;
     public ISensor GpuLoad;
+    public ISensor GpuVoltage;
     public ISensor GpuTemperature;
     public ISensor GpuMemoryClock;
     public ISensor GpuMemoryUsed;
@@ -83,7 +84,7 @@ public class Monitor(Computer computer, UpdateVisitor updateVisitor)
         
         // 获取硬件
         var motherboard = computer.Hardware.First(a => a.HardwareType == HardwareType.Motherboard);
-        var superIo = motherboard.SubHardware.First(a => a.HardwareType == HardwareType.SuperIO);
+        // var superIo = motherboard.SubHardware.First(a => a.HardwareType == HardwareType.SuperIO);
         var cpu = computer.Hardware.First(a => a.HardwareType == HardwareType.Cpu);
         var mem = computer.Hardware.First(a => a.HardwareType == HardwareType.Memory);
         var intelGpu = computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuIntel);
@@ -161,16 +162,17 @@ public class Monitor(Computer computer, UpdateVisitor updateVisitor)
         if (gpuSensor.HardwareType == HardwareType.GpuNvidia)
         {
             gpuSensorInfo.GpuPower = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Power);
+            gpuSensorInfo.GpuVoltage = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Voltage);
             gpuSensorInfo.GpuClock = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Clock && s.Name.ToLower().Contains("core"));
             gpuSensorInfo.GpuLoad = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Load && s.Name.ToLower().Contains("gpu"));
             gpuSensorInfo.GpuTemperature = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature && s.Name.ToLower().Contains("core"));
             gpuSensorInfo.GpuMemoryClock = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Clock && s.Name.ToLower().Contains("memory"));
             gpuSensorInfo.GpuMemoryUsed = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.SmallData && s.Name.Equals("GPU Memory Used"));
             gpuSensorInfo.GpuMemoryLoad = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Load && s.Name.Equals("GPU Memory"));
-
         } else if (gpuSensor.HardwareType == HardwareType.GpuAmd)
         {
             gpuSensorInfo.GpuPower = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Power);
+            gpuSensorInfo.GpuVoltage = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Voltage);
             gpuSensorInfo.GpuClock = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Clock && s.Name.ToLower().Contains("core"));
             gpuSensorInfo.GpuLoad = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Load && s.Name.ToLower().Contains("gpu"));
             gpuSensorInfo.GpuTemperature = gpuSensor.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature && s.Name.ToLower().Contains("core"));
