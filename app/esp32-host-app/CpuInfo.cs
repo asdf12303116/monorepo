@@ -79,144 +79,168 @@ public class CpuInfo
     public void GetCpuInfo(out CpuCoreCount coreCount)
     {
         coreCount = new CpuCoreCount();
-        // 尝试调用 GetSystemCpuSetInformation
-        var buffer = IntPtr.Zero;
-        uint bufferLength = 0;
-        uint returnedLength;
 
-        try
+        if (RuntimeInformation.OSDescription.Contains("Windows"))
         {
-            // 第一次调用以获取所需缓冲区大小
-            if (!GetSystemCpuSetInformation(IntPtr.Zero, 0, out returnedLength, IntPtr.Zero, 0))
+            // 尝试调用 GetSystemCpuSetInformation
+            var buffer = IntPtr.Zero;
+            uint bufferLength = 0;
+            uint returnedLength;
+
+            try
             {
-                var error = Marshal.GetLastWin32Error();
-                if (error != 122) // ERROR_INSUFFICIENT_BUFFER
+                // 第一次调用以获取所需缓冲区大小
+                if (!GetSystemCpuSetInformation(IntPtr.Zero, 0, out returnedLength, IntPtr.Zero, 0))
                 {
-                    Console.WriteLine($"第一次调用失败，错误代码: {error}");
-                    return;
-                }
-            }
-
-            // 分配缓冲区
-            buffer = Marshal.AllocHGlobal((int)returnedLength);
-
-            // 第二次调用以获取 CPU 集信息
-            if (GetSystemCpuSetInformation(buffer, returnedLength, out returnedLength, IntPtr.Zero, 0))
-            {
-                var coreInfoList = new List<CoreInfo>();
-                // 遍历缓冲区中的信息
-                var current = buffer;
-                while (current < buffer + returnedLength)
-                {
-                    var info = Marshal.PtrToStructure<SYSTEM_CPU_SET_INFORMATION>(current);
-
-                    // 打印 CPU 信息
-                    var coreInfo = new CoreInfo
+                    var error = Marshal.GetLastWin32Error();
+                    if (error != 122) // ERROR_INSUFFICIENT_BUFFER
                     {
-                        Id = info.Info.CpuSet.Id,
-                        CoreIndex = info.Info.CpuSet.CoreIndex,
-                        LogicalProcessorIndex = info.Info.CpuSet.LogicalProcessorIndex,
-                        EfficiencyClass = info.Info.CpuSet.EfficiencyClass
-                    };
-                    coreInfoList.Add(coreInfo);
-
-                    // 移动指针到下一个结构
-                    current = IntPtr.Add(current, (int)info.Size);
+                        Console.WriteLine($"第一次调用失败，错误代码: {error}");
+                        return;
+                    }
                 }
 
-                coreCount = new CpuCoreCount();
+                // 分配缓冲区
+                buffer = Marshal.AllocHGlobal((int)returnedLength);
 
-                // 基础统计 - 不需要转换为List
-                var coreInfoArray = coreInfoList.ToArray(); // 只转换一次，避免多次枚举
-                var physicalGroups = coreInfoArray.GroupBy(c => c.CoreIndex);
-
-                coreCount.TotalCore = coreInfoArray.Length;
-                coreCount.PhysicalCpu = physicalGroups.Count();
-                coreCount.LogicalCpu = coreInfoArray.Length;
-
-                // 超线程范围计算 - 避免额外的ToList
-                var smtCores = coreInfoArray.Where(c =>
-                    physicalGroups.First(g => g.Key == c.CoreIndex).Count() > 1);
-
-                if (smtCores.Any())
-                    coreCount.SMTCoreRange = new CoreRange
-                    {
-                        Start = (int)smtCores.Min(c => c.LogicalProcessorIndex) + 1,
-                        End = smtCores.Select(s => s.CoreIndex).Distinct().Count()
-                    };
-                else
-                    coreCount.SMTCoreRange = CoreRange.Empty;
-
-                // 能效核心分类 - 简化逻辑
-                var efficiencyGroups = coreInfoArray.GroupBy(c => c.EfficiencyClass).ToArray();
-
-                if (efficiencyGroups.Length > 1)
+                // 第二次调用以获取 CPU 集信息
+                if (GetSystemCpuSetInformation(buffer, returnedLength, out returnedLength, IntPtr.Zero, 0))
                 {
-                    // 找出性能核心组(最高效率类)和能效核心组(最低效率类)
-                    var maxEfficiencyClass = efficiencyGroups.Max(g => g.Key);
-                    var minEfficiencyClass = efficiencyGroups.Min(g => g.Key);
-
-                    var performanceCores = coreInfoArray.Where(c => c.EfficiencyClass == maxEfficiencyClass);
-                    var efficientCores = coreInfoArray.Where(c => c.EfficiencyClass == minEfficiencyClass);
-
-                    // 性能核心统计
-                    coreCount.PerformanceCore = performanceCores
-                        .Select(c => c.CoreIndex)
-                        .Distinct()
-                        .Count();
-
-                    // 能效核心统计
-                    coreCount.EfficientCore = efficientCores
-                        .Select(c => c.CoreIndex)
-                        .Distinct()
-                        .Count();
-
-                    // 能效核心范围
-                    if (efficientCores.Any())
+                    var coreInfoList = new List<CoreInfo>();
+                    // 遍历缓冲区中的信息
+                    var current = buffer;
+                    while (current < buffer + returnedLength)
                     {
-                        var isEfficientCoreBefore = efficientCores.Min(c => c.LogicalProcessorIndex) == 0;
-                        if (isEfficientCoreBefore)
+                        var info = Marshal.PtrToStructure<SYSTEM_CPU_SET_INFORMATION>(current);
+
+                        // 打印 CPU 信息
+                        var coreInfo = new CoreInfo
                         {
-                            coreCount.EfficientCoreRange = new CoreRange
-                            {
-                                Start = (int)efficientCores.Min(c => c.LogicalProcessorIndex),
-                                End = (int)efficientCores.Max(c => c.LogicalProcessorIndex)
-                            };  
+                            Id = info.Info.CpuSet.Id,
+                            CoreIndex = info.Info.CpuSet.CoreIndex,
+                            LogicalProcessorIndex = info.Info.CpuSet.LogicalProcessorIndex,
+                            EfficiencyClass = info.Info.CpuSet.EfficiencyClass
+                        };
+                        coreInfoList.Add(coreInfo);
 
+                        // 移动指针到下一个结构
+                        current = IntPtr.Add(current, (int)info.Size);
+                    }
+
+                    coreCount = new CpuCoreCount();
+
+                    // 基础统计 - 不需要转换为List
+                    var coreInfoArray = coreInfoList.ToArray(); // 只转换一次，避免多次枚举
+                    var physicalGroups = coreInfoArray.GroupBy(c => c.CoreIndex);
+
+                    coreCount.TotalCore = coreInfoArray.Length;
+                    coreCount.PhysicalCpu = physicalGroups.Count();
+                    coreCount.LogicalCpu = coreInfoArray.Length;
+
+                    // 超线程范围计算 - 避免额外的ToList
+                    var smtCores = coreInfoArray.Where(c =>
+                        physicalGroups.First(g => g.Key == c.CoreIndex).Count() > 1);
+
+                    if (smtCores.Any())
+                        coreCount.SMTCoreRange = new CoreRange
+                        {
+                            Start = (int)smtCores.Min(c => c.LogicalProcessorIndex) + 1,
+                            End = smtCores.Select(s => s.CoreIndex).Distinct().Count()
+                        };
+                    else
+                        coreCount.SMTCoreRange = CoreRange.Empty;
+
+                    // 能效核心分类 - 简化逻辑
+                    var efficiencyGroups = coreInfoArray.GroupBy(c => c.EfficiencyClass).ToArray();
+
+                    if (efficiencyGroups.Length > 1)
+                    {
+                        // 找出性能核心组(最高效率类)和能效核心组(最低效率类)
+                        var maxEfficiencyClass = efficiencyGroups.Max(g => g.Key);
+                        var minEfficiencyClass = efficiencyGroups.Min(g => g.Key);
+
+                        var performanceCores = coreInfoArray.Where(c => c.EfficiencyClass == maxEfficiencyClass);
+                        var efficientCores = coreInfoArray.Where(c => c.EfficiencyClass == minEfficiencyClass);
+
+                        // 性能核心统计
+                        coreCount.PerformanceCore = performanceCores
+                            .Select(c => c.CoreIndex)
+                            .Distinct()
+                            .Count();
+
+                        // 能效核心统计
+                        coreCount.EfficientCore = efficientCores
+                            .Select(c => c.CoreIndex)
+                            .Distinct()
+                            .Count();
+
+                        // 能效核心范围
+                        if (efficientCores.Any())
+                        {
+                            var isEfficientCoreBefore = efficientCores.Min(c => c.LogicalProcessorIndex) == 0;
+                            if (isEfficientCoreBefore)
+                                coreCount.EfficientCoreRange = new CoreRange
+                                {
+                                    Start = (int)efficientCores.Min(c => c.LogicalProcessorIndex),
+                                    End = (int)efficientCores.Max(c => c.LogicalProcessorIndex)
+                                };
+                            else
+                                coreCount.EfficientCoreRange = new CoreRange
+                                {
+                                    Start = (int)efficientCores.Min(c => c.LogicalProcessorIndex) -
+                                            coreCount.PerformanceCore,
+                                    End = (int)efficientCores.Max(c => c.LogicalProcessorIndex) -
+                                          coreCount.PerformanceCore
+                                };
                         }
                         else
                         {
-                            coreCount.EfficientCoreRange = new CoreRange
-                            {
-                                Start = (int)efficientCores.Min(c => c.LogicalProcessorIndex) - coreCount.PerformanceCore,
-                                End = (int)efficientCores.Max(c => c.LogicalProcessorIndex) - coreCount.PerformanceCore
-                            }; 
+                            coreCount.EfficientCoreRange = CoreRange.Empty;
                         }
-                        
                     }
                     else
                     {
+                        // 只有一种核心类型，全部算作性能核心
+                        coreCount.PerformanceCore = coreCount.PhysicalCpu;
+                        coreCount.EfficientCore = 0;
                         coreCount.EfficientCoreRange = CoreRange.Empty;
                     }
                 }
                 else
                 {
-                    // 只有一种核心类型，全部算作性能核心
-                    coreCount.PerformanceCore = coreCount.PhysicalCpu;
-                    coreCount.EfficientCore = 0;
-                    coreCount.EfficientCoreRange = CoreRange.Empty;
+                    var error = Marshal.GetLastWin32Error();
+                    Console.WriteLine($"第二次调用失败，错误代码: {error}");
                 }
             }
-            else
+            finally
             {
-                var error = Marshal.GetLastWin32Error();
-                Console.WriteLine($"第二次调用失败，错误代码: {error}");
+                // 释放分配的缓冲区
+                if (buffer != IntPtr.Zero) Marshal.FreeHGlobal(buffer);
             }
         }
-        finally
+        else if (RuntimeInformation.OSDescription.Contains("Linux"))
         {
-            // 释放分配的缓冲区
-            if (buffer != IntPtr.Zero) Marshal.FreeHGlobal(buffer);
+            /**
+             * 6
+
+A more precise answer that doesn't require guessing based on processor characteristics like frequency or number of threads, is that this information is exposed in the /sys pseudo filesystem:
+
+On Alder lake (and mostly like other hybrid Intel architectures), instead of /sys/devices/cpu there are two directories: /sys/devices/cpu_atom/ and /sys/devices/cpu_core/, being the first (cpu_atom) for the e-cores and the second (cpu_core) for the p-cores.
+
+Inside each directory there is a file named cpus that contain the cpu range number.
+
+For example, in my i7-1360P:
+
+/sys/devices/cpu_core/cpus contain 0-7 (four p-cores with two threads each)
+/sys/devices/cpu_atom/cpus contain 8-15
+             */
+            coreCount.EfficientCore = 8;
+            coreCount.EfficientCoreRange = new CoreRange { Start = 6, End = 13 };
+            coreCount.LogicalCpu = 20;
+            coreCount.PhysicalCpu = 14;
+            coreCount.TotalCore = 20;
+            coreCount.PerformanceCore = 6;
+            coreCount.SMTCoreRange = new CoreRange { Start = 1, End = 6 };
         }
     }
 }

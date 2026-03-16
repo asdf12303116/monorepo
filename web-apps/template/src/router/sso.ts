@@ -28,8 +28,7 @@ export const checkSso = (params : ssoInfo) => {
     // 清空本地旧信息
     removeToken();
 
-    api.ssoToken(params).then(data => {
-
+    api.ssoTokenPost(params).then(data => {
       if (data.success) {
         const user = getLoginUser(data.body);
         setToken(user);

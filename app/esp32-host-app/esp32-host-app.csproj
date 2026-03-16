@@ -12,9 +12,21 @@
     <Prefer32bit>false</Prefer32bit>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PresentMonSdkDir Condition="'$(PresentMonSdkDir)' == ''">C:\Program Files\Intel\PresentMon\SDK</PresentMonSdkDir>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('$(PresentMonSdkDir)\PresentMonAPI2Loader.dll')">
+    <Content Include="$(PresentMonSdkDir)\PresentMonAPI2Loader.dll">
+      <Link>PresentMonAPI2Loader.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

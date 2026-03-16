@@ -1,11 +1,12 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Globalization;
 
 namespace esp32_host_app;
 
 public static class DataFormat
 {
-    public static JsonObject GetJsonInfo(CpuCoreCount coreCount, ReadSensor sensor)
+    public static JsonObject GetJsonInfo(CpuCoreCount coreCount, ReadSensor sensor, int fps)
     {
         var json = new JsonObject();
         var hasECore = coreCount.EfficientCore > 0;
@@ -39,25 +40,46 @@ public static class DataFormat
         basicData.cpu_tdp = sensor.CpuSensor.CpuPower.Value;
         
         //gpu 数据
-        basicData.gpu_core_freq = sensor.GpuSensor.GpuClock.Value.ToString();
-        basicData.gpu_core_usage_number = sensor.GpuSensor.GpuLoad.Value.ToString();
-        basicData.gpu_core_volt = "";
+        basicData.gpu_core_freq = sensor.GpuSensor.GpuClock.Value.ToString() ?? string.Empty;
+        basicData.gpu_core_usage_number = sensor.GpuSensor.GpuLoad.Value.ToString() ?? string.Empty;
+        var gpuVoltage = sensor.GpuSensor.GpuVoltage;
+        var gpuVoltageValue = gpuVoltage?.Value;
+
+        if ( !float.IsNaN(gpuVoltageValue.Value))
+        {
+            var millivolts = (int)Math.Round(gpuVoltageValue.Value * 1000, MidpointRounding.AwayFromZero);
+            basicData.gpu_core_volt = millivolts.ToString();
+        }
+        else
+        {
+            basicData.gpu_core_volt = "0";
+        }
+        
         basicData.gpu_limit_heat = "";
         basicData.gpu_limit_power = "";
-        basicData.gpu_mem_freq = sensor.GpuSensor.GpuMemoryClock.Value.ToString();
-        basicData.gpu_mem_usage_number = sensor.GpuSensor.GpuMemoryUsed.Value.ToString();
-        basicData.gpu_mem_usage_rate = sensor.GpuSensor.GpuMemoryLoad.Value.ToString();
-        basicData.gpu_tdp = sensor.GpuSensor.GpuPower.Value.ToString();
-        basicData.gpu_temp = sensor.GpuSensor.GpuTemperature.Value.ToString();
+        basicData.gpu_mem_freq = sensor.GpuSensor.GpuMemoryClock.Value.ToString() ?? string.Empty;
+        basicData.gpu_mem_usage_number = sensor.GpuSensor.GpuMemoryUsed.Value.ToString() ?? string.Empty;
+        basicData.gpu_mem_usage_rate = sensor.GpuSensor.GpuMemoryLoad.Value.ToString() ?? string.Empty;
+        if (sensor.GpuSensor.GpuPower != null)
+        {
+            basicData.gpu_tdp = sensor.GpuSensor.GpuPower.Value.ToString() ?? string.Empty;
+        }
+        else
+        {
+            basicData.gpu_tdp = "0";
+        }
+        // basicData.gpu_tdp = sensor.GpuSensor.GpuPower.Value.ToString() ?? string.Empty;
+        basicData.gpu_temp = sensor.GpuSensor.GpuTemperature.Value.ToString() ?? string.Empty;
         
         // mem 数据
-        basicData.mem_usage_number = sensor.MemorySensor.MemoryUsed.Value.ToString();
-        basicData.mem_usage_rate = sensor.MemorySensor.MemoryLoad.Value.ToString();
+        basicData.mem_usage_number = sensor.MemorySensor.MemoryUsed.Value.ToString() ?? string.Empty;
+        basicData.mem_usage_rate = sensor.MemorySensor.MemoryLoad.Value.ToString() ?? string.Empty;
         
         // fps 数据
-        basicData.fps = "";
-        basicData.present_mon_fps = "";
-        basicData.rtss_fps="";
+        var fpsValue = fps.ToString(CultureInfo.InvariantCulture);
+        basicData.fps = fpsValue;
+        basicData.present_mon_fps = fpsValue;
+        basicData.rtss_fps = "0";
         
         // cpu_freq_data cpu_usage_data
         var cpu_freq_data = new JsonObject();
