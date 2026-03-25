@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace esp32_host_app;
 
@@ -220,27 +221,113 @@ public class CpuInfo
         }
         else if (RuntimeInformation.OSDescription.Contains("Linux"))
         {
-            /**
-             * 6
-
-A more precise answer that doesn't require guessing based on processor characteristics like frequency or number of threads, is that this information is exposed in the /sys pseudo filesystem:
-
-On Alder lake (and mostly like other hybrid Intel architectures), instead of /sys/devices/cpu there are two directories: /sys/devices/cpu_atom/ and /sys/devices/cpu_core/, being the first (cpu_atom) for the e-cores and the second (cpu_core) for the p-cores.
-
-Inside each directory there is a file named cpus that contain the cpu range number.
-
-For example, in my i7-1360P:
-
-/sys/devices/cpu_core/cpus contain 0-7 (four p-cores with two threads each)
-/sys/devices/cpu_atom/cpus contain 8-15
-             */
-            coreCount.EfficientCore = 8;
-            coreCount.EfficientCoreRange = new CoreRange { Start = 6, End = 13 };
-            coreCount.LogicalCpu = 20;
-            coreCount.PhysicalCpu = 14;
-            coreCount.TotalCore = 20;
-            coreCount.PerformanceCore = 6;
-            coreCount.SMTCoreRange = new CoreRange { Start = 1, End = 6 };
+            PopulateLinuxCpuInfo(out coreCount);
         }
+    }
+
+    private static void PopulateLinuxCpuInfo(out CpuCoreCount coreCount)
+    {
+        coreCount = new CpuCoreCount();
+        const string cpuSysPath = "/sys/devices/system/cpu";
+
+        var logicalCpuIds = Directory.Exists(cpuSysPath)
+            ? Directory.EnumerateDirectories(cpuSysPath, "cpu*")
+                .Select(Path.GetFileName)
+                .Where(name => name is not null && name.Length > 3 && name[3..].All(char.IsDigit))
+                .Select(name => int.Parse(name![3..], CultureInfo.InvariantCulture))
+                .OrderBy(id => id)
+                .ToList()
+            : [];
+
+        coreCount.LogicalCpu = logicalCpuIds.Count;
+        coreCount.TotalCore = logicalCpuIds.Count;
+
+        var physicalCoreKeys = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var cpuId in logicalCpuIds)
+        {
+            var coreIdPath = Path.Combine(cpuSysPath, $"cpu{cpuId}", "topology", "core_id");
+            var packageIdPath = Path.Combine(cpuSysPath, $"cpu{cpuId}", "topology", "physical_package_id");
+
+            var coreId = File.Exists(coreIdPath) ? File.ReadAllText(coreIdPath).Trim() : cpuId.ToString(CultureInfo.InvariantCulture);
+            var packageId = File.Exists(packageIdPath) ? File.ReadAllText(packageIdPath).Trim() : "0";
+            physicalCoreKeys.Add($"{packageId}:{coreId}");
+        }
+
+        coreCount.PhysicalCpu = physicalCoreKeys.Count > 0 ? physicalCoreKeys.Count : coreCount.LogicalCpu;
+
+        var eCoreCpuIds = CpuSetParser.Parse(ReadAllTextOrEmpty("/sys/devices/cpu_atom/cpus"));
+        var pCoreCpuIds = CpuSetParser.Parse(ReadAllTextOrEmpty("/sys/devices/cpu_core/cpus"));
+
+        if (eCoreCpuIds.Count > 0 && pCoreCpuIds.Count > 0)
+        {
+            coreCount.EfficientCore = CountPhysicalCores(cpuSysPath, eCoreCpuIds);
+            coreCount.PerformanceCore = CountPhysicalCores(cpuSysPath, pCoreCpuIds);
+            coreCount.EfficientCoreRange = BuildRange(logicalCpuIds, eCoreCpuIds);
+            coreCount.SMTCoreRange = BuildSmtRange(cpuSysPath, logicalCpuIds);
+        }
+        else
+        {
+            coreCount.EfficientCore = 0;
+            coreCount.PerformanceCore = coreCount.PhysicalCpu;
+            coreCount.EfficientCoreRange = CoreRange.Empty;
+            coreCount.SMTCoreRange = BuildSmtRange(cpuSysPath, logicalCpuIds);
+        }
+    }
+
+    private static int CountPhysicalCores(string cpuSysPath, HashSet<int> logicalCpuIds)
+    {
+        var physicalCoreKeys = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var cpuId in logicalCpuIds)
+        {
+            var coreIdPath = Path.Combine(cpuSysPath, $"cpu{cpuId}", "topology", "core_id");
+            var packageIdPath = Path.Combine(cpuSysPath, $"cpu{cpuId}", "topology", "physical_package_id");
+
+            var coreId = File.Exists(coreIdPath) ? File.ReadAllText(coreIdPath).Trim() : cpuId.ToString(CultureInfo.InvariantCulture);
+            var packageId = File.Exists(packageIdPath) ? File.ReadAllText(packageIdPath).Trim() : "0";
+            physicalCoreKeys.Add($"{packageId}:{coreId}");
+        }
+
+        return physicalCoreKeys.Count;
+    }
+
+    private static CoreRange BuildRange(List<int> logicalCpuIds, HashSet<int> targetCpuIds)
+    {
+        var indexes = logicalCpuIds
+            .Select((cpuId, index) => new { cpuId, index })
+            .Where(item => targetCpuIds.Contains(item.cpuId))
+            .Select(item => item.index)
+            .ToList();
+
+        return indexes.Count == 0
+            ? CoreRange.Empty
+            : new CoreRange { Start = indexes.Min(), End = indexes.Max() };
+    }
+
+    private static CoreRange BuildSmtRange(string cpuSysPath, List<int> logicalCpuIds)
+    {
+        var siblingCounts = new List<int>();
+        foreach (var cpuId in logicalCpuIds)
+        {
+            var siblingsPath = Path.Combine(cpuSysPath, $"cpu{cpuId}", "topology", "thread_siblings_list");
+            if (!File.Exists(siblingsPath))
+            {
+                continue;
+            }
+
+            var siblings = CpuSetParser.Parse(File.ReadAllText(siblingsPath));
+            siblingCounts.Add(siblings.Count);
+        }
+
+        if (siblingCounts.Count == 0 || siblingCounts.Max() <= 1)
+        {
+            return CoreRange.Empty;
+        }
+
+        return new CoreRange { Start = 1, End = siblingCounts.Count(count => count > 1) };
+    }
+
+    private static string ReadAllTextOrEmpty(string path)
+    {
+        return File.Exists(path) ? File.ReadAllText(path) : string.Empty;
     }
 }

@@ -4,97 +4,90 @@ using System.Globalization;
 
 namespace esp32_host_app;
 
-public static class DataFormat
+public static partial class DataFormat
 {
-    public static JsonObject GetJsonInfo(CpuCoreCount coreCount, ReadSensor sensor, int fps)
+    public static JsonObject GetJsonInfo(CpuCoreCount coreCount, HardwareSnapshot snapshot, int fps)
     {
         var json = new JsonObject();
         var hasECore = coreCount.EfficientCore > 0;
-        // 外层基础数据
+
         json["e_core_count"] = coreCount.EfficientCore;
         json["p_core_count"] = coreCount.PerformanceCore;
         json["logical_cpu_count"] = coreCount.LogicalCpu;
         json["physical_cpu_count"] = coreCount.PhysicalCpu;
-        
-        var basicData = new Data();
-        
-        // cpu数据
-        basicData.cpu_avg_usage = sensor.CpuSensor.CpuTotalUsage.Value;
+
+        var basicData = new Data
+        {
+            cpu_avg_usage = snapshot.CpuAverageUsage,
+            cpu_temp = snapshot.CpuTemperature,
+            cpu_tdp = snapshot.CpuPower,
+            gpu_core_freq = FormatString(snapshot.Gpu.CoreFrequencyMHz),
+            gpu_core_usage_number = FormatString(snapshot.Gpu.CoreUsagePercent),
+            gpu_core_volt = FormatString(snapshot.Gpu.CoreVoltageMillivolts, "0"),
+            gpu_limit_heat = snapshot.Gpu.LimitHeat,
+            gpu_limit_power = snapshot.Gpu.LimitPower,
+            gpu_mem_freq = FormatString(snapshot.Gpu.MemoryFrequencyMHz),
+            gpu_mem_usage_number = FormatString(snapshot.Gpu.MemoryUsedMiB),
+            gpu_mem_usage_rate = FormatString(snapshot.Gpu.MemoryUsagePercent),
+            gpu_tdp = FormatString(snapshot.Gpu.PowerWatts),
+            gpu_temp = FormatString(snapshot.Gpu.TemperatureCelsius),
+            mem_usage_number = FormatString(snapshot.Memory.UsedGigabytes),
+            mem_usage_rate = FormatString(snapshot.Memory.UsagePercent)
+        };
+
+        var cpuFreqValues = snapshot.CpuCores
+            .Where(core => core.FrequencyMHz.HasValue)
+            .Select(core => core.FrequencyMHz!.Value)
+            .ToList();
+
+        if (cpuFreqValues.Count > 0)
+        {
+            basicData.cpu_freq = cpuFreqValues.Average();
+        }
+
         if (hasECore)
         {
-            basicData.e_core_freq = sensor.CpuSensor.CpuClockUsage
-                .Where(s => s.CoreId >= coreCount.EfficientCoreRange.Start &&
-                            s.CoreId <= coreCount.EfficientCoreRange.End)
-                .Select(s => s.CpuClock.Value).Average();
-            basicData.p_core_freq = sensor.CpuSensor.CpuClockUsage
-                .Where(x => x.CoreId < 6 || x.CoreId > 13)
-                .Select(s => s.CpuClock.Value).Average();
-            basicData.cpu_freq = sensor.CpuSensor.CpuClockUsage.Select(x=>x.CpuClock.Value).Average();
-        }
-        else
-        {
-            basicData.cpu_freq = sensor.CpuSensor.CpuClockUsage.Select(x=>x.CpuClock.Value).Average();
-        }
-        basicData.cpu_freq = sensor.CpuSensor.CpuPower.Value;
-        basicData.cpu_temp = sensor.CpuSensor.CpuTemperature.Value;
-        basicData.cpu_tdp = sensor.CpuSensor.CpuPower.Value;
-        
-        //gpu 数据
-        basicData.gpu_core_freq = sensor.GpuSensor.GpuClock.Value.ToString() ?? string.Empty;
-        basicData.gpu_core_usage_number = sensor.GpuSensor.GpuLoad.Value.ToString() ?? string.Empty;
-        var gpuVoltage = sensor.GpuSensor.GpuVoltage;
-        var gpuVoltageValue = gpuVoltage?.Value;
+            var eCoreFrequencies = snapshot.CpuCores
+                .Where(core => core.IsEfficientCore && core.FrequencyMHz.HasValue)
+                .Select(core => core.FrequencyMHz!.Value)
+                .ToList();
+            if (eCoreFrequencies.Count > 0)
+            {
+                basicData.e_core_freq = eCoreFrequencies.Average();
+            }
 
-        if ( !float.IsNaN(gpuVoltageValue.Value))
-        {
-            var millivolts = (int)Math.Round(gpuVoltageValue.Value * 1000, MidpointRounding.AwayFromZero);
-            basicData.gpu_core_volt = millivolts.ToString();
+            var pCoreFrequencies = snapshot.CpuCores
+                .Where(core => !core.IsEfficientCore && core.FrequencyMHz.HasValue)
+                .Select(core => core.FrequencyMHz!.Value)
+                .ToList();
+            if (pCoreFrequencies.Count > 0)
+            {
+                basicData.p_core_freq = pCoreFrequencies.Average();
+            }
         }
-        else
-        {
-            basicData.gpu_core_volt = "0";
-        }
-        
-        basicData.gpu_limit_heat = "";
-        basicData.gpu_limit_power = "";
-        basicData.gpu_mem_freq = sensor.GpuSensor.GpuMemoryClock.Value.ToString() ?? string.Empty;
-        basicData.gpu_mem_usage_number = sensor.GpuSensor.GpuMemoryUsed.Value.ToString() ?? string.Empty;
-        basicData.gpu_mem_usage_rate = sensor.GpuSensor.GpuMemoryLoad.Value.ToString() ?? string.Empty;
-        if (sensor.GpuSensor.GpuPower != null)
-        {
-            basicData.gpu_tdp = sensor.GpuSensor.GpuPower.Value.ToString() ?? string.Empty;
-        }
-        else
-        {
-            basicData.gpu_tdp = "0";
-        }
-        // basicData.gpu_tdp = sensor.GpuSensor.GpuPower.Value.ToString() ?? string.Empty;
-        basicData.gpu_temp = sensor.GpuSensor.GpuTemperature.Value.ToString() ?? string.Empty;
-        
-        // mem 数据
-        basicData.mem_usage_number = sensor.MemorySensor.MemoryUsed.Value.ToString() ?? string.Empty;
-        basicData.mem_usage_rate = sensor.MemorySensor.MemoryLoad.Value.ToString() ?? string.Empty;
-        
-        // fps 数据
+
         var fpsValue = fps.ToString(CultureInfo.InvariantCulture);
         basicData.fps = fpsValue;
         basicData.present_mon_fps = fpsValue;
         basicData.rtss_fps = "0";
-        
-        // cpu_freq_data cpu_usage_data
-        var cpu_freq_data = new JsonObject();
-        var cpu_usage_data = new JsonObject();
-        foreach (var cpuClockUsage in sensor.CpuSensor.CpuClockUsage)
+
+        var cpuFreqData = new JsonObject();
+        var cpuUsageData = new JsonObject();
+        foreach (var core in snapshot.CpuCores.OrderBy(x => x.CoreId))
         {
-            cpu_freq_data[$"cpu{cpuClockUsage.CoreId}_freq"] = cpuClockUsage.CpuClock.Value;
-            cpu_usage_data[$"cpu{cpuClockUsage.CoreId}_usage_rate"] = cpuClockUsage.CpuLoad.Value;
+            cpuFreqData[$"cpu{core.CoreId}_freq"] = core.FrequencyMHz;
+            cpuUsageData[$"cpu{core.CoreId}_usage_rate"] = core.UsagePercent;
         }
-        
-        json["cpu_freq_data"] = cpu_freq_data;
-        json["cpu_usage_data"] = cpu_usage_data;
+
+        json["cpu_freq_data"] = cpuFreqData;
+        json["cpu_usage_data"] = cpuUsageData;
         json["data"] = JsonSerializer.SerializeToNode(basicData);
-        
+
         return json;
     }
-    
+
+    private static string FormatString(float? value, string fallback = "0")
+    {
+        return value?.ToString(CultureInfo.InvariantCulture) ?? fallback;
+    }
 }

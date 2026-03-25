@@ -55,6 +55,8 @@ public class MqttSend
     {
         try
         {
+            var payload = data.ToJsonString();
+
             if (!mqttClient.IsConnected)
             {
                 ConnectAsync().Wait();
@@ -62,7 +64,7 @@ public class MqttSend
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
-                .WithPayload(data.ToString())
+                .WithPayload(payload)
                 .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
                 .WithRetainFlag()
                 .Build();

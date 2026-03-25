@@ -16,10 +16,19 @@
     <PresentMonSdkDir Condition="'$(PresentMonSdkDir)' == ''">C:\Program Files\Intel\PresentMon\SDK</PresentMonSdkDir>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
+    <Compile Remove="Monitor.cs" />
+    <Compile Remove="WindowsAppRunner.cs" />
+    <Compile Remove="DataFormat.Windows.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('$(PresentMonSdkDir)\PresentMonAPI2Loader.dll')">

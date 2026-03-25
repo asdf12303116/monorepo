@@ -1,0 +1,19 @@
+[Unit]
+Description=ESP32 Host App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/app
+ExecStart=/usr/bin/dotnet /opt/app/esp32-host-app.dll
+Restart=always
+RestartSec=3
+User=esp32-host-app
+Group=esp32-host-app
+AmbientCapabilities=CAP_DAC_READ_SEARCH
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+NoNewPrivileges=false
+
+[Install]
+WantedBy=multi-user.target

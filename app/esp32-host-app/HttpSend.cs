@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using LibreHardwareMonitor.Hardware;
 using RestSharp;
 
 namespace esp32_host_app;
