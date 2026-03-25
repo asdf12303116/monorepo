@@ -85,7 +85,6 @@ public class CpuInfo
         {
             // 尝试调用 GetSystemCpuSetInformation
             var buffer = IntPtr.Zero;
-            uint bufferLength = 0;
             uint returnedLength;
 
             try

@@ -29,11 +29,11 @@ public struct ReadSensor
 public struct CpuSensor
 {
     public String CpuName;
-    public ISensor CpuVoltage;
-    public ISensor CpuPower;
+    public ISensor? CpuVoltage;
+    public ISensor? CpuPower;
     public List<CpuClockUsage> CpuClockUsage;
-    public ISensor CpuTotalUsage;
-    public ISensor CpuTemperature; 
+    public ISensor? CpuTotalUsage;
+    public ISensor? CpuTemperature; 
 }
 
 public struct CpuClockUsage
@@ -45,34 +45,40 @@ public struct CpuClockUsage
 
 public struct MemorySensor
 {
-    public ISensor MemoryUsed;
-    public ISensor MemoryAvailable;
-    public ISensor MemoryLoad;
+    public ISensor? MemoryUsed;
+    public ISensor? MemoryAvailable;
+    public ISensor? MemoryLoad;
 }
 public struct GpuSensor
 {
 
-    public ISensor GpuPower;
-    public ISensor GpuClock;
-    public ISensor GpuLoad;
-    public ISensor GpuVoltage;
-    public ISensor GpuTemperature;
-    public ISensor GpuMemoryClock;
-    public ISensor GpuMemoryUsed;
-    public ISensor GpuMemoryLoad;
+    public ISensor? GpuPower;
+    public ISensor? GpuClock;
+    public ISensor? GpuLoad;
+    public ISensor? GpuVoltage;
+    public ISensor? GpuTemperature;
+    public ISensor? GpuMemoryClock;
+    public ISensor? GpuMemoryUsed;
+    public ISensor? GpuMemoryLoad;
 }
 
-public class Monitor(Computer computer, UpdateVisitor updateVisitor)
+public class Monitor
 {
-    public Computer Computer { get; set; } = computer;
-    public UpdateVisitor UpdateVisitor { get; set; } = updateVisitor;
+    public Monitor(Computer computer, UpdateVisitor updateVisitor)
+    {
+        Computer = computer;
+        UpdateVisitor = updateVisitor;
+    }
+
+    public Computer Computer { get; set; }
+    public UpdateVisitor UpdateVisitor { get; set; }
 
 
     public void Init(out ReadSensor sensors)
     {
         
-        computer.Open();
-        computer.Accept(updateVisitor);
+        Computer.Open();
+        Computer.Accept(UpdateVisitor);
 
         sensors = new ReadSensor();
         
@@ -83,13 +89,12 @@ public class Monitor(Computer computer, UpdateVisitor updateVisitor)
         // 处理传感器数据
         
         // 获取硬件
-        var motherboard = computer.Hardware.First(a => a.HardwareType == HardwareType.Motherboard);
+        var motherboard = Computer.Hardware.First(a => a.HardwareType == HardwareType.Motherboard);
         // var superIo = motherboard.SubHardware.First(a => a.HardwareType == HardwareType.SuperIO);
-        var cpu = computer.Hardware.First(a => a.HardwareType == HardwareType.Cpu);
-        var mem = computer.Hardware.First(a => a.HardwareType == HardwareType.Memory);
-        var intelGpu = computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuIntel);
-        var nvidiaGpu = computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuNvidia);
-        var amdGpu = computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuAmd);
+        var cpu = Computer.Hardware.First(a => a.HardwareType == HardwareType.Cpu);
+        var mem = Computer.Hardware.First(a => a.HardwareType == HardwareType.Memory);
+        var nvidiaGpu = Computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuNvidia);
+        var amdGpu = Computer.Hardware.FirstOrDefault(a => a.HardwareType == HardwareType.GpuAmd);
 
        // 获取CPU Sensor 信息
 
@@ -155,9 +160,14 @@ public class Monitor(Computer computer, UpdateVisitor updateVisitor)
         sensors.MemorySensor = memorySensor;
         
         // GPU信息
-        var gpuSensor = nvidiaGpu??amdGpu;
-        
         var gpuSensorInfo = new GpuSensor();
+
+        var gpuSensor = nvidiaGpu ?? amdGpu;
+        if (gpuSensor == null)
+        {
+            sensors.GpuSensor = gpuSensorInfo;
+            return;
+        }
 
         if (gpuSensor.HardwareType == HardwareType.GpuNvidia)
         {

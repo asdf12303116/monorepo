@@ -5,7 +5,7 @@ namespace esp32_host_app;
 
 public class PemCertificateLoader
 {
-    public static X509Certificate2 LoadCertificateFromPemString(string pemString)
+    public static X509Certificate2? LoadCertificateFromPemString(string pemString)
     {
         // 移除PEM字符串的头部和尾部，以及所有空白字符
         string base64Content = pemString
