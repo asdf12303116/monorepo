@@ -111,8 +111,8 @@ public class Monitor(Computer computer, UpdateVisitor updateVisitor)
         }
         //  CPU 频率
         var cpuClockSensor = cpu.Sensors.Where(s => 
-                s.SensorType == SensorType.Clock && s.Name.ToLower().Contains("cpu")).
-            ToDictionary(s=>s.Name.Split("#")[1].Trim(), s=>s);
+                s.SensorType == SensorType.Clock && s.Name.ToLower().Contains("core")).
+            ToDictionary(s=>s.Index.ToString(), s=>s);
         
         // cpu 使用率
         var cpuLoadSensor = cpu.Sensors.Where(s => s.SensorType == SensorType.Load);
